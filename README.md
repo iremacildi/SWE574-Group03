@@ -1,4 +1,3 @@
-#Bogazici University - Software Engineering, M.Sc.
 
 I share my researches, studies and assignments for the course.
 
