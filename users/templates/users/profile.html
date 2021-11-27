@@ -1,0 +1,88 @@
+{% extends "eventify/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="content-section">
+    <div class="media">
+        <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+        <div class="media-body">
+            <p class="account-heading">{{ user.first_name}} {{ user.last_name}}</p>
+            <p class="text-secondary">Username: {{ user.username }}</p>
+            <p class="text-secondary">Email: {{user.email }}</p>
+            <p class="text-secondary">Credits: {{credits }}</p>
+        </div>
+        <a class="btn btn-info btn-sm mt-1 mb-1 float-right" href="{% url 'editprofile' %}">Update</a>
+</div> 
+<div style="bottom:50%; left:32%">
+    <button onclick="openEvent()" class="btn btn-primary">Events</button>
+    <button onclick="openService()" class="btn btn-primary">Services</button>
+</div>
+
+<!-- <button onclick="openEvent()">Event</button>
+<button onclick="openService()">Service</button> -->
+</div>
+
+<div id="event" style="display:block">
+{% for post in object_list %}
+<article class="media content-section">
+ <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+ <div class="media-body">
+   <div class="article-metadata">
+     <a class="mr-2" href="{% url 'user_posts' post.author.username %}">{{ post.author }}</a>
+     <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+   </div>
+ <h2><a class="article-title" href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h2>
+   <p class="article-content">{{ post.content|safe }}</p>
+ </div>
+</article>
+{% endfor %}
+{% if object_list|length is 0 %}
+<div class="alert alert-warning">
+    <strong>Warning!</strong> There is no event to show
+  </div>
+    {% endif %}
+</div>
+
+<div id="service" style="display:none">
+    {% for service in service_list %}
+    <article class="media content-section">
+      <img class="rounded-circle article-img" src="{{ service.author.profile.image.url }}">
+      <div class="media-body">
+        <div class="article-metadata">
+          <a class="mr-2" href="{% url 'user_services' service.author.username %}">{{ service.author }}</a>
+          <small class="text-muted">{{ service.date_posted|date:"F d, Y" }}</small>
+        </div>
+      <h2><a class="article-title" href="{% url 'service_detail' service.pk %}">{{ service.title }}</a></h2>
+        <p class="article-content">{{ service.content|safe }}</p>
+      </div>
+    </article>
+
+    {% endfor %}
+    {% if service_list|length is 0 %}
+<div class="alert alert-warning">
+    <strong>Warning!</strong> There is no service to show
+  </div>
+    {% endif %}
+</div>
+
+<script>
+    function openEvent() {
+        var event = document.getElementById("event");
+        console.log('log',event.style)
+        var service = document.getElementById("service");
+        event.style.display = "block";
+        service.style.display="none";
+      }
+      </script>
+    
+    <script>
+        function openService() {
+            var event = document.getElementById("event");
+            var service = document.getElementById("service");
+            event.style.display = "none";
+            service.style.display="block";
+          }
+          </script>
+
+{% endblock content %}
+

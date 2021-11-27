@@ -1,0 +1,95 @@
+{% extends "eventify/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="content-section">
+
+    <!-- Author information -->
+    <div class="media">
+        <img class="d-flex mr-3 rounded-circle article-img" src="{{ object.author.profile.image.url }}" alt="">
+        <div class="media-body">
+            <h4 class="mt-0"><a href="{% url 'user_services' object.author.username %}">{{ object.author }}</a></h4>
+            <h6 class="mt-0">{{ object.author.email }}</h6>
+        </div>
+        {% if object.author_id is not user.id %}
+        <form method="POST" action="{% url 'register_service' object.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="hidden" name="user_id" value="{{user.id}}">
+            </div>
+
+                 <button class="btn btn-primary" name="service_id" value="{{object.id}}"type="submit">Register</button> 
+           
+        </form>
+        {% endif %}
+      
+    </div>
+    <hr>
+
+    <!-- Post information -->
+    <div>
+        <h1 class="mt-4">{{object.title}}</h1>
+        <p>
+            Posted on {{ object.date_posted|date:"F d, Y" }}
+            {% if object.author == user %}
+            <a class="btn btn-info btn-sm mt-1 mb-1 float-right" href="{% url 'service_update' object.id %}">Update</a>
+            <a class="btn btn-danger btn-sm mt-1 mb-1 float-right mr-2 "
+                href="{% url 'service_delete' object.id %}">Delete</a>
+            {% endif %}
+        </p>
+    </div>
+    <hr>
+
+    <!-- Preview Image -->
+    <img class="img-fluid rounded" src="{{service.picture.url}}" alt="" width="400" height="200">
+    <hr>
+
+    <!-- Post Content -->
+    <p class="lead">{{ object.content|safe|linebreaks }}</p>
+    <hr>
+
+ 
+
+
+    <!-- Comment Form -->
+    {% if user.is_authenticated %}
+    <div class="card my-4">
+        <h5 class="card-header">Leave a Comment:</h5>
+        <div class="card-body">
+            <form method="POST" action="{% url 'add_servicecomment' object.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea class="form-control" name="text" rows="3" required></textarea>
+                    <input type="hidden" name="user_id" value="{{user.id}}">
+                </div>
+                <button class="btn btn-primary" type="submit">Comment</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <a href="{% url 'login' %}" class="btn btn-success btn-lg btn-block mb-4">
+        Sign In for comment and like the post.
+    </a>
+    {% endif %}
+
+    <!-- Single Comments -->
+    {% for servicecomment in service.servicecomment.all %}
+    {% if servicecomment.approved_comment %}
+    <div class="media mb-4">
+        <img class="d-flex mr-3 rounded-circle article-img" src="{{servicecomment.author.profile.image.url }}" alt="">
+        <div class="media-body">
+            <h5 class="mt-0"><a href="{% url 'user_services' servicecomment.author.username %}">{{ servicecomment.author }}</a></h5>
+            {{ servicecomment.text|linebreaks }}
+            <hr>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-secondary" role="alert">
+        No Comment has been posted.
+    </div>
+    {% endif %}
+    {% endfor %}
+
+  
+</div>
+{% endblock content %}
