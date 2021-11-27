@@ -1,6 +1,7 @@
 {% extends "eventify/base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
+
 <div class="content-section">
     <div class="media">
         <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
@@ -9,20 +10,66 @@
             <p class="text-secondary">Username: {{ user.username }}</p>
             <p class="text-secondary">Email: {{user.email }}</p>
         </div>
-    </div>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Profile Info</legend>
-            {{ u_form|crispy }}
-            {{ p_form|crispy }}
-        </fieldset>
-        <div class="form-group">
-                <a href="{% url 'password_change' %}" class="btn btn-outline-danger" role="button">Change Password</a>
-        </div>
-        <div class="form-group">
-            <button class="btn btn-success" type="submit">Update</button>
-        </div>
-    </form>
+        <a class="btn btn-info btn-sm mt-1 mb-1 float-right" href="{% url 'editprofile' %}">Update</a>
+</div> 
+<div style="position:fixed; bottom:50%; left:32%">
+    <button onclick="openEvent()" class="btn btn-primary">Events</button>
+    <button onclick="openService()" class="btn btn-primary">Services</button>
 </div>
+<!-- <button onclick="openEvent()">Event</button>
+<button onclick="openService()">Service</button> -->
+</div>
+<div id="event" style="display:block">
+{% for post in object_list %}
+<article class="media content-section">
+ <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+ <div class="media-body">
+   <div class="article-metadata">
+     <a class="mr-2" href="{% url 'user_posts' post.author.username %}">{{ post.author }}</a>
+     <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+   </div>
+ <h2><a class="article-title" href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h2>
+   <p class="article-content">{{ post.content|safe }}</p>
+ </div>
+</article>
+{% endfor %}
+</div>
+
+<div id="service" style="display:none">
+    {% for service in service_list %}
+    <article class="media content-section">
+      <img class="rounded-circle article-img" src="{{ service.author.profile.image.url }}">
+      <div class="media-body">
+        <div class="article-metadata">
+          <a class="mr-2" href="{% url 'user_services' service.author.username %}">{{ service.author }}</a>
+          <small class="text-muted">{{ service.date_posted|date:"F d, Y" }}</small>
+        </div>
+      <h2><a class="article-title" href="{% url 'service_detail' service.pk %}">{{ service.title }}</a></h2>
+        <p class="article-content">{{ service.content|safe }}</p>
+      </div>
+    </article>
+
+   
+    {% endfor %}
+</div>
+<script>
+    function openEvent() {
+        var event = document.getElementById("event");
+        console.log('log',event.style)
+        var service = document.getElementById("service");
+        event.style.display = "block";
+        service.style.display="none";
+      }
+      </script>
+    
+    <script>
+        function openService() {
+            var event = document.getElementById("event");
+            var service = document.getElementById("service");
+            event.style.display = "none";
+            service.style.display="block";
+          }
+          </script>
+
 {% endblock content %}
+

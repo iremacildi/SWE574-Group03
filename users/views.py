@@ -1,7 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+
+import users
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from eventify.models import Post,Service
+
 
 
 def register(request):
@@ -34,9 +38,36 @@ def profile(request):
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
+        post_list=Post.objects.filter(author_id=request.user.id).order_by('-date_posted')
+        service_list=Service.objects.filter(author_id=request.user.id).order_by('-date_posted')
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form,
+        'object_list':post_list,
+        'service_list':service_list
+    }
+    return render(request, 'users/profile.html', context)
+
+@login_required
+def editprofile(request):
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=request.user.profile)
+
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, "Your account has been updated!")
+            return redirect('profile')
+
+    else:
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=request.user.profile)
 
     context = {
         'u_form': u_form,
         'p_form': p_form
     }
-    return render(request, 'users/profile.html', context)
+    return render(request, 'users/editprofile.html', context)

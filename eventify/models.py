@@ -39,7 +39,7 @@ class Service(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     eventdate = models.DateField(default=timezone.now)
-    eventtime=models.TimeField(default=timezone.now)
+    eventtime=models.TimeField(blank=True)
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
     content = models.TextField()
