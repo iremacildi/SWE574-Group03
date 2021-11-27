@@ -7,7 +7,7 @@ from .models import Post,Service
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title','duration','eventdate','eventtime','content','picture',]
+        fields = ['title','duration','eventdate','eventtime','content','picture','capacity']
 
         widgets = {
             'content': forms.Textarea(attrs={'class': 'editable medium-editor-textarea'}),
@@ -18,7 +18,7 @@ class PostForm(forms.ModelForm):
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['title','duration','eventdate','eventtime','content','picture']
+        fields = ['title','duration','eventdate','eventtime','content','picture','capacity']
 
         widgets = {
             'content': forms.Textarea(attrs={'class': 'editable medium-editor-textarea'}),

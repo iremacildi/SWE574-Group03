@@ -21,6 +21,8 @@ class Post(models.Model):
     eventtime=models.TimeField(blank=True)
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
+    capacity=models.IntegerField(default=1,validators=[MaxValueValidator(100), MinValueValidator(1)]
+     )
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=True)
     date_posted = models.DateTimeField(default=timezone.now)
    
@@ -41,6 +43,8 @@ class Service(models.Model):
     eventdate = models.DateField(default=timezone.now)
     eventtime=models.TimeField(blank=True)
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
+     )
+    capacity=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
     content = models.TextField()
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=True)

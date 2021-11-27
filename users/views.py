@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 import users
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from eventify.models import Post,Service
+from .models import Profile
 
 
 
@@ -26,6 +27,7 @@ def register(request):
 def profile(request):
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
+
         p_form = ProfileUpdateForm(
             request.POST, request.FILES, instance=request.user.profile)
 
@@ -38,6 +40,7 @@ def profile(request):
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
+        profile=Profile.objects.get(user_id=request.user.id)
         post_list=Post.objects.filter(author_id=request.user.id).order_by('-date_posted')
         service_list=Service.objects.filter(author_id=request.user.id).order_by('-date_posted')
 
@@ -45,7 +48,8 @@ def profile(request):
         'u_form': u_form,
         'p_form': p_form,
         'object_list':post_list,
-        'service_list':service_list
+        'service_list':service_list,
+        'credits':profile.credits
     }
     return render(request, 'users/profile.html', context)
 

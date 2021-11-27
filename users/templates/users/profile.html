@@ -9,16 +9,19 @@
             <p class="account-heading">{{ user.first_name}} {{ user.last_name}}</p>
             <p class="text-secondary">Username: {{ user.username }}</p>
             <p class="text-secondary">Email: {{user.email }}</p>
+            <p class="text-secondary">Credits: {{credits }}</p>
         </div>
         <a class="btn btn-info btn-sm mt-1 mb-1 float-right" href="{% url 'editprofile' %}">Update</a>
 </div> 
-<div style="position:fixed; bottom:50%; left:32%">
+<div style="bottom:50%; left:32%">
     <button onclick="openEvent()" class="btn btn-primary">Events</button>
     <button onclick="openService()" class="btn btn-primary">Services</button>
 </div>
+
 <!-- <button onclick="openEvent()">Event</button>
 <button onclick="openService()">Service</button> -->
 </div>
+
 <div id="event" style="display:block">
 {% for post in object_list %}
 <article class="media content-section">
@@ -33,6 +36,11 @@
  </div>
 </article>
 {% endfor %}
+{% if object_list|length is 0 %}
+<div class="alert alert-warning">
+    <strong>Warning!</strong> There is no event to show
+  </div>
+    {% endif %}
 </div>
 
 <div id="service" style="display:none">
@@ -49,9 +57,14 @@
       </div>
     </article>
 
-   
     {% endfor %}
+    {% if service_list|length is 0 %}
+<div class="alert alert-warning">
+    <strong>Warning!</strong> There is no service to show
+  </div>
+    {% endif %}
 </div>
+
 <script>
     function openEvent() {
         var event = document.getElementById("event");

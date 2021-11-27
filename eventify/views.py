@@ -96,7 +96,7 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title', 'content','picture']
+    fields = ['title','duration','eventdate','eventtime','capacity','content','picture']
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -110,7 +110,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Service
-    fields = ['title', 'content','picture']
+    fields = ['title','duration','eventdate','eventtime','capacity','content','picture']
 
     def form_valid(self, form):
         form.instance.author = self.request.user
