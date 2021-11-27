@@ -18,7 +18,7 @@ class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
     eventdate = models.DateField(default=timezone.now)
-    eventtime=models.TimeField(default=timezone.now)
+    eventtime=models.TimeField(blank=True)
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=True)
