@@ -81,19 +81,19 @@ WSGI_APPLICATION = 'web.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    #  'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'eventifyDb', 
-    #     'USER': 'postgres', 
-    #     'PASSWORD': 'Pass1234',
-    #     'HOST': 'localhost', 
-    #     'PORT': '5432',
-    # }
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3', # This is where you put the name of the db file. 
-                 # If one doesn't exist, it will be created at migration time.
+     'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'eventifyDb', 
+        'USER': 'postgres', 
+        'PASSWORD': 'Pass1234',
+        'HOST': 'localhost', 
+        'PORT': '5432',
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': 'db.sqlite3', # This is where you put the name of the db file. 
+    #              # If one doesn't exist, it will be created at migration time.
+    # }
 }
 
 
