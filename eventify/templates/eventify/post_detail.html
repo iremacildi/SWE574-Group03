@@ -2,6 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
+
 <div class="content-section">
 
     <!-- Author information -->
@@ -11,16 +12,15 @@
             <h4 class="mt-0"><a href="{% url 'user_posts' object.author.username %}">{{ object.author }}</a></h4>
             <h6 class="mt-0">{{ object.author.email }}</h6>
         </div>
-        
-        {% if object.author_id is not user.id %}
+        {% now "d-m-Y" as todays_date %}
+        {% if object.author_id is not user.id and object.eventdate|date:"d-m-Y" > todays_date|date:"d-m-Y" %}
         <form method="POST" action="{% url 'register_event' object.id %}">
             {% csrf_token %}
             <div class="form-group">
                 <input type="hidden" name="user_id" value="{{user.id}}">
             </div>
-
                  <button class="btn btn-primary" name="post_id" value="{{object.id}}"type="submit">Register</button> 
-           
+
         </form>
         {% endif %}
     </div>
@@ -28,7 +28,7 @@
 
     <!-- Post information -->
     <div>
-        <h1 class="mt-4">{{object.title}}</h1>
+        <h1 class="mt-4">Title: {{object.title}}</h1>
         <p>
             Posted on {{ object.date_posted|date:"F d, Y" }}
             {% if object.author == user %}
@@ -45,7 +45,11 @@
     <hr>
 
     <!-- Post Content -->
-    <p class="lead">{{ object.content|safe|linebreaks }}</p>
+    <p class="lead"><strong>Description:</strong> {{ object.content|safe|linebreaks }}</p>
+    <p class="lead"><strong>Event Date: </strong> {{ object.eventdate|date}}</p>
+    <p class="lead"><strong>Start Time: </strong> {{ object.eventtime}} </p>
+    <p class="lead"><strong>Duration: </strong> {{ object.duration}} Hours</p>
+    <p class="lead"><strong>Capacity: </strong>{{ object.capacity}} People</p>
     <hr>
 
  
