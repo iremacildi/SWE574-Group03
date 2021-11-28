@@ -36,6 +36,6 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('post/<int:pk>/comment/', add_comment, name='add_comment'),
     path('post/<int:pk>/postregister/', register_event, name='register_event'),
-    path('post/<int:pk>/serviceregister/', register_service, name='register_service'),
+    path('service/<int:pk>/serviceregister/', register_service, name='register_service'),
     path('service/<int:pk>/servicecomment/', add_servicecomment, name='add_servicecomment'),
 ]

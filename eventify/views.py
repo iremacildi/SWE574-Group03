@@ -187,7 +187,7 @@ def register_event(request, pk):
 
         except:
             pass
-        RegisterEvent(author=user, post=post, username=user.username).save()
+        RegisterEvent(author=user, post=post,username=user.username).save()
         messages.success(request, "You register event successfully")
         return redirect('post_detail', pk=pk) 
        
