@@ -97,8 +97,9 @@ class RegisterService(models.Model):
     service = models.ForeignKey(Service, related_name='serviceregister', on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     username = models.TextField()
+    owner=models.TextField(blank=True)
     created_date = models.DateTimeField(default=timezone.now)
-    approved_register = models.BooleanField(default=True)
+    approved_register = models.BooleanField(default=False)
 
     def approve(self):
         self.approved_comment = True

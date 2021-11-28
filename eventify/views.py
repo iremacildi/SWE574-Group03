@@ -71,6 +71,7 @@ class UserServiceListView(ListView):
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get('username'))
         return Service.objects.filter(author=user).order_by('-date_posted')
+    
 
 class PostDetailView(DetailView):
     model = Post
@@ -209,9 +210,11 @@ def register_service(request, pk):
 
         except:
             pass
-        RegisterService(author=user, service=service, username=user.username).save()
+        RegisterService(author=user, service=service,owner=service.author.id, username=user.username).save()
         messages.success(request, "You register event successfully")
         return redirect('service_detail', pk=pk) 
        
     else:
         return redirect('service_detail', pk=pk)
+
+     

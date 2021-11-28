@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('eventify', '0001_initial'),
+        ('eventify', '0002_post_liked'),
     ]
 
     operations = [
