@@ -84,6 +84,8 @@ def approve_service_register(request):
         user = request.POST.get('author')
         item = request.POST.get('item_id')
         answer = request.POST.get('answer')
+        registerentity=RegisterService.objects.get(id=item)
+        service=Service.objects.get(id=registerentity.service_id)
         accept_delete=request.POST.get('type')
         if accept_delete=='Delete':
             RegisterService.objects.filter(author=user,id=item).delete()
@@ -92,6 +94,9 @@ def approve_service_register(request):
             register=RegisterService.objects.get(author=user,id=item)
             register.approved_register=answer
             register.save()
+            profil=Profile.objects.get(id=registerentity.author_id)
+            profil.credits-=service.duration
+            profil.save()
             messages.success(request, "Başarılı bir şekilde kabul edildi")
     else:
         return redirect('profile')

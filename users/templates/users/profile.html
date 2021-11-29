@@ -33,12 +33,15 @@
           <input type="hidden" name="answer" value="True">
           <input type="hidden" name="item_id" value="{{item.id}}">
           <input type="hidden" name="author" value="{{item.author_id}}">
-      </div>
-           <button class="btn btn-primary" name="type" value="Delete" type="submit">Delete</button>
-           <button class="btn btn-primary" name="type" value="Approve" type="submit">Approve</button>  
-  
+          <p class="article-content"><strong>Service Name: </strong>{{item.title}}</p>
+          <p class="article-content"><strong>Applicant:</strong> {{ item.username }}</p>
+          <p class="article-content"><strong>Status:</strong> {{item.approved_register}}</p>
+    
+           <button style="color:brown" class="btn " name="type" value="Delete" type="submit">Reject</button>
+           <button style="color:rgb(29, 177, 15)" class="btn" name="type" value="Approve" type="submit">Approve</button>  
+          </div>
   </form>
-     <p class="article-content">{{ item.id }} {{ item.username }}  {{item.approved_register}}</p>
+    
      {% if registerservice|length is 0 %}
 <div class="alert alert-warning">
     <strong>Warning!</strong> There is no event to show
@@ -47,9 +50,11 @@
 </div>
   
   </article>
-  {% endfor %}
 
+  {% endfor %}
 </div>
+
+
 
 <div id="event" style="display:block">
 {% for post in object_list %}
