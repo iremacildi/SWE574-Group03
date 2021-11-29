@@ -44,6 +44,7 @@ def profile(request):
         post_list=Post.objects.filter(author_id=request.user.id).order_by('-date_posted')
         service_list=Service.objects.filter(author_id=request.user.id).order_by('-date_posted')
         registerservice=RegisterService.objects.filter(owner=request.user.id,approved_register=False)
+        myregisterservice=RegisterService.objects.filter(author_id=request.user.id)
 
     context = {
         'u_form': u_form,
@@ -51,7 +52,8 @@ def profile(request):
         'object_list':post_list,
         'service_list':service_list,
         'credits':profile.credits,
-        'registerservice':registerservice
+        'registerservice':registerservice,
+        'myregisterservice':myregisterservice
     }
     return render(request, 'users/profile.html', context)
 
