@@ -16,11 +16,45 @@
 <div style="bottom:50%; left:32%">
     <button onclick="openEvent()" class="btn btn-primary">Events</button>
     <button onclick="openService()" class="btn btn-primary">Services</button>
+    <button onclick="openApprovals()" class="btn btn-primary">Approvals</button>
 </div>
 
 <!-- <button onclick="openEvent()">Event</button>
 <button onclick="openService()">Service</button> -->
 </div>
+<div id="approvals" style="display:none">
+  {% for item in registerservice %}
+  <article class="media content-section">
+   <div class="media-body">
+    <form method="POST" action="{% url 'approve_service_register'%}">
+      {% csrf_token %}
+      <div class="form-group">
+          <input type="hidden" name="user_id" value="{{user.id}}">
+          <input type="hidden" name="answer" value="True">
+          <input type="hidden" name="item_id" value="{{item.id}}">
+          <input type="hidden" name="author" value="{{item.author_id}}">
+          <p class="article-content"><strong>Service Name: </strong>{{item.title}}</p>
+          <p class="article-content"><strong>Applicant:</strong> {{ item.username }}</p>
+          <p class="article-content"><strong>Status:</strong> {{item.approved_register}}</p>
+    
+           <button style="color:brown" class="btn " name="type" value="Delete" type="submit">Reject</button>
+           <button style="color:rgb(29, 177, 15)" class="btn" name="type" value="Approve" type="submit">Approve</button>  
+          </div>
+  </form>
+    
+     {% if registerservice|length is 0 %}
+<div class="alert alert-warning">
+    <strong>Warning!</strong> There is no event to show
+  </div>
+    {% endif %}
+</div>
+  
+  </article>
+
+  {% endfor %}
+</div>
+
+
 
 <div id="event" style="display:block">
 {% for post in object_list %}
@@ -68,10 +102,11 @@
 <script>
     function openEvent() {
         var event = document.getElementById("event");
-        console.log('log',event.style)
+        var app = document.getElementById("approvals");
         var service = document.getElementById("service");
         event.style.display = "block";
         service.style.display="none";
+        app.style.display = "none";
       }
       </script>
     
@@ -79,10 +114,22 @@
         function openService() {
             var event = document.getElementById("event");
             var service = document.getElementById("service");
+            var app = document.getElementById("approvals");
+            app.style.display = "none";
             event.style.display = "none";
             service.style.display="block";
           }
           </script>
+     <script>
+      function openApprovals() {
+          var app = document.getElementById("approvals");
+          var service = document.getElementById("service");
+          var event = document.getElementById("event");
+          app.style.display = "block";
+          event.style.display = "none";
+          service.style.display="none";
+        }
+        </script>      
 
 {% endblock content %}
 

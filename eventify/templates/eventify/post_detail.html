@@ -12,8 +12,8 @@
             <h4 class="mt-0"><a href="{% url 'user_posts' object.author.username %}">{{ object.author }}</a></h4>
             <h6 class="mt-0">{{ object.author.email }}</h6>
         </div>
-        {% now "d-m-Y" as todays_date %}
-        {% if object.author_id is not user.id and object.eventdate|date:"d-m-Y" > todays_date|date:"d-m-Y" %}
+        {% now "m-d" as todays_date %}
+        {% if object.author_id is not user.id and object.eventdate|date:"m-d" > todays_date %}
         <form method="POST" action="{% url 'register_event' object.id %}">
             {% csrf_token %}
             <div class="form-group">

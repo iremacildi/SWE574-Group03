@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 
 import users
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
-from eventify.models import Post,Service
+from eventify.models import Post, RegisterEvent, RegisterService,Service
 from .models import Profile
 
 
@@ -43,13 +43,15 @@ def profile(request):
         profile=Profile.objects.get(user_id=request.user.id)
         post_list=Post.objects.filter(author_id=request.user.id).order_by('-date_posted')
         service_list=Service.objects.filter(author_id=request.user.id).order_by('-date_posted')
+        registerservice=RegisterService.objects.filter(owner=request.user.id,approved_register=False)
 
     context = {
         'u_form': u_form,
         'p_form': p_form,
         'object_list':post_list,
         'service_list':service_list,
-        'credits':profile.credits
+        'credits':profile.credits,
+        'registerservice':registerservice
     }
     return render(request, 'users/profile.html', context)
 
@@ -75,3 +77,37 @@ def editprofile(request):
         'p_form': p_form
     }
     return render(request, 'users/editprofile.html', context)
+    
+@login_required
+def approve_service_register(request):
+    if request.method == 'POST':
+        user = request.POST.get('author')
+        item = request.POST.get('item_id')
+        answer = request.POST.get('answer')
+        registerentity=RegisterService.objects.get(id=item)
+        service=Service.objects.get(id=registerentity.service_id)
+        accept_delete=request.POST.get('type')
+        if accept_delete=='Delete':
+            RegisterService.objects.filter(author=user,id=item).delete()
+            messages.success(request, "Başarılı bir şekilde rededildi")
+        else:    
+            register=RegisterService.objects.get(author=user,id=item)
+            register.approved_register=answer
+            register.save()
+            profil=Profile.objects.get(id=registerentity.author_id)
+            profil.credits-=service.duration
+            profil.save()
+            messages.success(request, "Başarılı bir şekilde kabul edildi")
+    else:
+        return redirect('profile')
+    return redirect('profile')
+
+# @login_required
+# def delete_service_register(request):
+#     if request.method == 'POST':
+#         user = request.POST.get('author')
+#         item = request.POST.get('item_id')
+        
+#     else:
+#         return redirect('profile/')
+#     return redirect('profile/')

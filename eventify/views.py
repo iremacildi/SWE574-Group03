@@ -1,5 +1,6 @@
 from django.http.response import Http404, HttpResponse
 from .models import Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent
+from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -71,6 +72,7 @@ class UserServiceListView(ListView):
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get('username'))
         return Service.objects.filter(author=user).order_by('-date_posted')
+    
 
 class PostDetailView(DetailView):
     model = Post
@@ -187,7 +189,7 @@ def register_event(request, pk):
 
         except:
             pass
-        RegisterEvent(author=user, post=post, username=user.username).save()
+        RegisterEvent(author=user, post=post,title=post.title,username=user.username).save()
         messages.success(request, "You register event successfully")
         return redirect('post_detail', pk=pk) 
        
@@ -204,14 +206,21 @@ def register_service(request, pk):
         try:
             event=RegisterService.objects.filter(author_id=ids,service_id=service_id)
             if event:
-                messages.warning(request, "You already registered event")
+                messages.warning(request, "You already registered service")
                 return redirect('service_detail', pk=pk)
-
         except:
             pass
-        RegisterService(author=user, service=service, username=user.username).save()
-        messages.success(request, "You register event successfully")
-        return redirect('service_detail', pk=pk) 
+        profile=Profile.objects.get(user_id=user.id)
+        credit=profile.credits-service.duration
+        if credit<0:
+             messages.warning(request, "Not enough credits")
+             return redirect('service_detail', pk=pk)
+        else:
+         RegisterService(author=user, service=service,title=service.title,owner=service.author.id, username=user.username).save()
+         messages.success(request, "Registration request sent successfully")
+         return redirect('service_detail', pk=pk) 
        
     else:
         return redirect('service_detail', pk=pk)
+
+     
