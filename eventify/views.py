@@ -212,13 +212,18 @@ def register_service(request, pk):
             pass
         profile=Profile.objects.get(user_id=user.id)
         credit=profile.credits-service.duration
-        if credit<0:
-             messages.warning(request, "Not enough credits")
-             return redirect('service_detail', pk=pk)
-        else:
-         RegisterService(author=user, service=service,title=service.title,owner=service.author.id, username=user.username).save()
-         messages.success(request, "Registration request sent successfully")
-         return redirect('service_detail', pk=pk) 
+        capacityControl=RegisterService.objects.filter(service_id=service_id).count()
+        if service.capacity <= capacityControl:
+            messages.warning(request, "The service reached enough participants")
+            return redirect('service_detail', pk=pk)
+        else:    
+            if credit<0:
+                messages.warning(request, "Not enough credits")
+                return redirect('service_detail', pk=pk)
+            else:
+                RegisterService(author=user, service=service,title=service.title,owner=service.author.id, username=user.username).save()
+                messages.success(request, "Registration request sent successfully")
+                return redirect('service_detail', pk=pk) 
        
     else:
         return redirect('service_detail', pk=pk)

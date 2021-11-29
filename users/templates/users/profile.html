@@ -41,17 +41,15 @@
            <button style="color:rgb(29, 177, 15)" class="btn" name="type" value="Approve" type="submit">Approve</button>  
           </div>
   </form>
-    
-     {% if registerservice|length is 0 %}
-<div class="alert alert-warning">
-    <strong>Warning!</strong> There is no event to show
-  </div>
-    {% endif %}
-</div>
+
   
   </article>
-
   {% endfor %}
+  {% if registerservice|length is 0 %}
+<div class="alert alert-warning">
+No pending confirmation!
+</div>
+  {% endif %}
 </div>
 
 
@@ -72,7 +70,7 @@
 {% endfor %}
 {% if object_list|length is 0 %}
 <div class="alert alert-warning">
-    <strong>Warning!</strong> There is no event to show
+ There is no event to show
   </div>
     {% endif %}
 </div>
@@ -94,7 +92,7 @@
     {% endfor %}
     {% if service_list|length is 0 %}
 <div class="alert alert-warning">
-    <strong>Warning!</strong> There is no service to show
+There is no service to show
   </div>
     {% endif %}
 </div>
