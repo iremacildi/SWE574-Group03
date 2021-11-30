@@ -49,7 +49,7 @@
     <hr>
 
     <!-- Preview Image -->
-    <img class="img-fluid rounded" src="{{post.picture.url}}" alt="" width="400" height="200">
+    <img class="img-fluid rounded" src="{{object.picture.url}}" alt="" width="400" height="200">
     <hr>
 
     <!-- Post Content -->
@@ -59,7 +59,7 @@
     <p class="lead"><strong>Duration: </strong> {{ object.duration}} Hours</p>
     <p class="lead"><strong>Capacity: </strong>{{ object.capacity}} People</p>
     <hr>
-
+    <p class="lead"><strong>Already Enrolled: </strong> {{ registerevent|length}} </p>
  
 
 

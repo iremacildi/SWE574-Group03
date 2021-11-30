@@ -76,10 +76,26 @@ class UserServiceListView(ListView):
     
 
 class PostDetailView(DetailView):
+    context_object_name = 'object'
     model = Post
 
+    def get_context_data(self, **kwargs):
+        pk=self.kwargs['pk']
+        context = super().get_context_data(**kwargs)
+        context['registerevent'] = RegisterEvent.objects.filter(post_id=pk,approved_register=True)
+        return context
+
+
 class ServiceDetailView(DetailView):
+    context_object_name = 'object'
     model = Service
+
+    def get_context_data(self, **kwargs):
+        pk=self.kwargs['pk']
+        context = super().get_context_data(**kwargs)
+        context['registerservice'] = RegisterService.objects.filter(service_id=pk,approved_register=True)
+        return context
+
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post

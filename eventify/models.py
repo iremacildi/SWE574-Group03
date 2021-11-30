@@ -82,7 +82,7 @@ class RegisterEvent(models.Model):
     username = models.TextField()
     title = models.CharField(max_length=100,blank=True)
     created_date = models.DateTimeField(default=timezone.now)
-    approved_register = models.BooleanField(default=False)
+    approved_register = models.BooleanField(default=True)
 
     def approve(self):
         self.approved_comment = True
