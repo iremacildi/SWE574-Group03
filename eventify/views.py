@@ -1,3 +1,4 @@
+from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
 from .models import Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent
 from users.models import Profile
@@ -99,6 +100,10 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     fields = ['title','duration','eventdate','eventtime','capacity','content','picture']
+    widgets = {
+            'eventdate':DateInput(attrs={'type': 'date'}),
+            'eventtime':TimeInput(attrs={'type': 'time'}),
+        }
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -113,6 +118,10 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Service
     fields = ['title','duration','eventdate','eventtime','capacity','content','picture']
+    widgets = {
+            'eventdate':DateInput(attrs={'type': 'date'}),
+            'eventtime':TimeInput(attrs={'type': 'time'}),
+        }
 
     def form_valid(self, form):
         form.instance.author = self.request.user
