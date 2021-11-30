@@ -61,7 +61,14 @@
     <hr>
     <p class="lead"><strong>Already Enrolled: </strong> {{ registerevent|length}} </p>
  
+    <button type="button" class="collapsible">Participants</button>
+    <div class="content">
+    {% for register in registerevent %}
+      <p><strong>Username: </strong>{{register.username}}</p>
+    {% endfor %}
+    </div>
 
+    
 
     <!-- Comment Form -->
     {% if user.is_authenticated %}
@@ -103,4 +110,45 @@
     {% endfor %}
 
 </div>
+<style>
+    .collapsible {
+      background-color: rgb(42, 148, 65);
+      color: white;
+      cursor: pointer;
+      padding: 18px;
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 15px;
+    }
+    
+    .active, .collapsible:hover {
+      background-color: rgb(85, 85, 85);
+    }
+    
+    .content {
+      padding: 0 18px;
+      display: none;
+      overflow: hidden;
+      background-color: #e9f2f8;
+    }
+    </style>
+
+    <script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+coll[i].addEventListener("click", function() {
+this.classList.toggle("active");
+var content = this.nextElementSibling;
+if (content.style.display === "block") {
+  content.style.display = "none";
+} else {
+  content.style.display = "block";
+}
+});
+}
+</script>
+
 {% endblock content %}
