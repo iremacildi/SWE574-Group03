@@ -11,17 +11,25 @@
             <h4 class="mt-0"><a href="{% url 'user_services' object.author.username %}">{{ object.author }}</a></h4>
             <h6 class="mt-0">{{ object.author.email }}</h6>
         </div>
+        {% if object.author_id is not user.id %}
         {% now "m-d" as todays_date %}
-        {% if object.author_id is not user.id and object.eventdate|date:"m-d" > todays_date %}
+        {% if  object.eventdate|date:"m-d" > todays_date %}
         <form method="POST" action="{% url 'register_service' object.id %}">
             {% csrf_token %}
             <div class="form-group">
                 <input type="hidden" name="user_id" value="{{user.id}}">
             </div>
+                 <button class="btn btn-primary" name="post_id" value="{{object.id}}"type="submit">Register</button> 
 
-                 <button class="btn btn-primary" name="service_id" value="{{object.id}}"type="submit">Register</button> 
         </form>
-        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-warning">
+            Application deadline has passed!
+          </div>
+
+          {% endif %}
+          {% endif %}
       
     </div>
     <hr>
