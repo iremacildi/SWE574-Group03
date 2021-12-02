@@ -62,16 +62,16 @@
   
     <hr>
 
-    
     <p class="lead"><strong>Already Enrolled: </strong> {{ registerservice|length}} </p>
 
+    {% if object.author == user %}
     <button type="button" class="collapsible">Participants</button>
     <div class="content">
     {% for register in registerservice %}
       <p><strong>Username: </strong>{{register.username}}</p>
     {% endfor %}
     </div>
-    
+    {% endif %}
     <!-- Comment Form -->
     {% if user.is_authenticated %}
     <div class="card my-4">

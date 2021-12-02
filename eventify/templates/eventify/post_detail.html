@@ -60,7 +60,7 @@
     <p class="lead"><strong>Capacity: </strong>{{ object.capacity}} People</p>
     <hr>
     <p class="lead"><strong>Already Enrolled: </strong> {{ registerevent|length}} </p>
- 
+    {% if object.author == user %}
     <button type="button" class="collapsible">Participants</button>
     <div class="content">
     {% for register in registerevent %}
@@ -68,7 +68,7 @@
     {% endfor %}
     </div>
 
-    
+    {% endif %}
 
     <!-- Comment Form -->
     {% if user.is_authenticated %}
