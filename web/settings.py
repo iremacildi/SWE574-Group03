@@ -9,24 +9,32 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
+from pathlib import Path
+from environ import Env
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+env = Env()
+env.read_env(env_file='web/.env')
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '3$!e5*ggej1g%8n!d77u^5jk$qy&_p_6r_gc2+mdu(2v1-&c%@'
+# SECRET_KEY = '3$!e5*ggej1g%8n!d77u^5jk$qy&_p_6r_gc2+mdu(2v1-&c%@'
+
+SECRET_KEY = env('DJANGO_SECRET_KEY', default = '3$!e5*ggej1g%8n!d77u^5jk$qy&_p_6r_gc2+mdu(2v1-&c%@')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = []
+DEBUG = env('DJANGO_DEBUG', default=True)
 
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
 
 # Application definition
 
@@ -41,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 
   
 ]
@@ -53,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware'
 ]
 
 
@@ -81,13 +92,15 @@ WSGI_APPLICATION = 'web.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'eventifyDb', 
-        'USER': 'postgres', 
-        'PASSWORD': 'Pass1234',
-        'HOST': 'localhost', 
-        'PORT': '5432',
+
+      'default': {
+        'ENGINE': env('DB_ENGINE', default = 'django.db.backends.postgresql_psycopg2'),
+        'NAME': env('DB_NAME', default='eventifyDb'), 
+        'USER': env('DB_USER', default='postgres'), 
+        'PASSWORD': env('DB_PASSWORD', default='Pass1234'),
+        # 'HOST': env('DB_HOST', default='127.0.0.1'), 
+        'HOST': env('DB_HOST'), 
+        'PORT': env('DB_PORT', default='5432'),
     }
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -96,6 +109,7 @@ DATABASES = {
     # }
 }
 
+CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS").split(" ")
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
