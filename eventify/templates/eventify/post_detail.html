@@ -12,8 +12,9 @@
             <h4 class="mt-0"><a href="{% url 'user_posts' object.author.username %}">{{ object.author }}</a></h4>
             <h6 class="mt-0">{{ object.author.email }}</h6>
         </div>
+        {% if object.author_id is not user.id %}
         {% now "m-d" as todays_date %}
-        {% if object.author_id is not user.id and object.eventdate|date:"m-d" > todays_date %}
+        {% if  object.eventdate|date:"m-d" > todays_date %}
         <form method="POST" action="{% url 'register_event' object.id %}">
             {% csrf_token %}
             <div class="form-group">
@@ -22,7 +23,14 @@
                  <button class="btn btn-primary" name="post_id" value="{{object.id}}"type="submit">Register</button> 
 
         </form>
-        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-warning">
+            Application deadline has passed!
+          </div>
+
+          {% endif %}
+          {% endif %}
     </div>
     <hr>
 
@@ -41,7 +49,7 @@
     <hr>
 
     <!-- Preview Image -->
-    <img class="img-fluid rounded" src="{{post.picture.url}}" alt="" width="400" height="200">
+    <img class="img-fluid rounded" src="{{object.picture.url}}" alt="" width="400" height="200">
     <hr>
 
     <!-- Post Content -->
@@ -51,9 +59,17 @@
     <p class="lead"><strong>Duration: </strong> {{ object.duration}} Hours</p>
     <p class="lead"><strong>Capacity: </strong>{{ object.capacity}} People</p>
     <hr>
+    <p class="lead"><strong>Already Enrolled: </strong> {{ registerevent|length}} </p>
+    
+    {% if object.author == user %}
+    <button type="button" class="collapsible">Participants</button>
+    <div class="content">
+    {% for register in registerevent %}
+      <p><strong>Username: </strong>{{register.username}}</p>
+    {% endfor %}
+    </div>
 
- 
-
+    {% endif %}
 
     <!-- Comment Form -->
     {% if user.is_authenticated %}
@@ -95,4 +111,45 @@
     {% endfor %}
 
 </div>
+<style>
+    .collapsible {
+      background-color: rgb(42, 148, 65);
+      color: white;
+      cursor: pointer;
+      padding: 18px;
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 15px;
+    }
+    
+    .active, .collapsible:hover {
+      background-color: rgb(85, 85, 85);
+    }
+    
+    .content {
+      padding: 0 18px;
+      display: none;
+      overflow: hidden;
+      background-color: #e9f2f8;
+    }
+    </style>
+
+    <script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+coll[i].addEventListener("click", function() {
+this.classList.toggle("active");
+var content = this.nextElementSibling;
+if (content.style.display === "block") {
+  content.style.display = "none";
+} else {
+  content.style.display = "block";
+}
+});
+}
+</script>
+
 {% endblock content %}

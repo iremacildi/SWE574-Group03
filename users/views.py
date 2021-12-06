@@ -44,6 +44,7 @@ def profile(request):
         post_list=Post.objects.filter(author_id=request.user.id).order_by('-date_posted')
         service_list=Service.objects.filter(author_id=request.user.id).order_by('-date_posted')
         registerservice=RegisterService.objects.filter(owner=request.user.id,approved_register=False)
+        myregisterservice=RegisterService.objects.filter(author_id=request.user.id)
 
     context = {
         'u_form': u_form,
@@ -51,7 +52,8 @@ def profile(request):
         'object_list':post_list,
         'service_list':service_list,
         'credits':profile.credits,
-        'registerservice':registerservice
+        'registerservice':registerservice,
+        'myregisterservice':myregisterservice
     }
     return render(request, 'users/profile.html', context)
 
@@ -89,15 +91,35 @@ def approve_service_register(request):
         accept_delete=request.POST.get('type')
         if accept_delete=='Delete':
             RegisterService.objects.filter(author=user,id=item).delete()
-            messages.success(request, "Başarılı bir şekilde rededildi")
+            messages.success(request, "Successfully rejected")
         else:    
             register=RegisterService.objects.get(author=user,id=item)
-            register.approved_register=answer
-            register.save()
+
             profil=Profile.objects.get(id=registerentity.author_id)
-            profil.credits-=service.duration
-            profil.save()
-            messages.success(request, "Başarılı bir şekilde kabul edildi")
+            ownerProfile=Profile.objects.get(id=service.author_id)
+            if service.paid==False:
+                credits=profil.credits-service.duration
+                if credits>=0:
+                    ownerProfile.credits+=service.duration
+                    ownerProfile.save()
+                    profil.credits-=service.duration
+                    profil.save()
+                    service.paid=True
+                    service.save()
+                    register.approved_register=answer
+                    register.save()
+                    messages.success(request, "Successfully accepted")
+                else:
+                    RegisterService.objects.filter(author=user,id=item).delete()
+                    messages.warning(request, "User has not enough credits")  
+                    return redirect('profile')  
+            else:
+                profil.credits-=service.duration
+                profil.save()
+                register.approved_register=answer
+                register.save()                
+                messages.success(request, "Successfully accepted")
+                return redirect('profile')
     else:
         return redirect('profile')
     return redirect('profile')

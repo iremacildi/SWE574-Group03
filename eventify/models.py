@@ -25,6 +25,7 @@ class Post(models.Model):
      )
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=True)
     date_posted = models.DateTimeField(default=timezone.now)
+    paid= models.BooleanField(default=False)
    
 
     class Meta:
@@ -49,6 +50,7 @@ class Service(models.Model):
     content = models.TextField()
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=True)
     date_posted = models.DateTimeField(default=timezone.now)
+    paid= models.BooleanField(default=False)
 
     class Meta:
         ordering = ('-date_posted', )
@@ -66,6 +68,7 @@ class ServiceComment(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     approved_comment = models.BooleanField(default=True)
 
+
     def approve(self):
         self.approved_comment = True
         self.save()
@@ -82,7 +85,7 @@ class RegisterEvent(models.Model):
     username = models.TextField()
     title = models.CharField(max_length=100,blank=True)
     created_date = models.DateTimeField(default=timezone.now)
-    approved_register = models.BooleanField(default=False)
+    approved_register = models.BooleanField(default=True)
 
     def approve(self):
         self.approved_comment = True

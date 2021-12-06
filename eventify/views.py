@@ -1,3 +1,4 @@
+from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
 from .models import Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent
 from users.models import Profile
@@ -75,10 +76,26 @@ class UserServiceListView(ListView):
     
 
 class PostDetailView(DetailView):
+    context_object_name = 'object'
     model = Post
 
+    def get_context_data(self, **kwargs):
+        pk=self.kwargs['pk']
+        context = super().get_context_data(**kwargs)
+        context['registerevent'] = RegisterEvent.objects.filter(post_id=pk,approved_register=True)
+        return context
+
+
 class ServiceDetailView(DetailView):
+    context_object_name = 'object'
     model = Service
+
+    def get_context_data(self, **kwargs):
+        pk=self.kwargs['pk']
+        context = super().get_context_data(**kwargs)
+        context['registerservice'] = RegisterService.objects.filter(service_id=pk,approved_register=True)
+        return context
+
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
@@ -99,6 +116,10 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     fields = ['title','duration','eventdate','eventtime','capacity','content','picture']
+    widgets = {
+            'eventdate':DateInput(attrs={'type': 'date'}),
+            'eventtime':TimeInput(attrs={'type': 'time'}),
+        }
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -113,6 +134,10 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Service
     fields = ['title','duration','eventdate','eventtime','capacity','content','picture']
+    widgets = {
+            'eventdate':DateInput(attrs={'type': 'date'}),
+            'eventtime':TimeInput(attrs={'type': 'time'}),
+        }
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -212,13 +237,18 @@ def register_service(request, pk):
             pass
         profile=Profile.objects.get(user_id=user.id)
         credit=profile.credits-service.duration
-        if credit<0:
-             messages.warning(request, "Not enough credits")
-             return redirect('service_detail', pk=pk)
-        else:
-         RegisterService(author=user, service=service,title=service.title,owner=service.author.id, username=user.username).save()
-         messages.success(request, "Registration request sent successfully")
-         return redirect('service_detail', pk=pk) 
+        capacityControl=RegisterService.objects.filter(service_id=service_id).count()
+        if service.capacity <= capacityControl:
+            messages.warning(request, "The service reached enough participants")
+            return redirect('service_detail', pk=pk)
+        else:    
+            if credit<0:
+                messages.warning(request, "Not enough credits")
+                return redirect('service_detail', pk=pk)
+            else:
+                RegisterService(author=user, service=service,title=service.title,owner=service.author.id, username=user.username).save()
+                messages.success(request, "Registration request sent successfully")
+                return redirect('service_detail', pk=pk) 
        
     else:
         return redirect('service_detail', pk=pk)

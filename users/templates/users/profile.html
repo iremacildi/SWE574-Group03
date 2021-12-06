@@ -17,11 +17,40 @@
     <button onclick="openEvent()" class="btn btn-primary">Events</button>
     <button onclick="openService()" class="btn btn-primary">Services</button>
     <button onclick="openApprovals()" class="btn btn-primary">Approvals</button>
+    <button onclick="openMyServices()" class="btn btn-primary">MyServices</button>
 </div>
 
 <!-- <button onclick="openEvent()">Event</button>
 <button onclick="openService()">Service</button> -->
 </div>
+<div id="myservices" style="display:none">
+  {% for item in myregisterservice %}
+  <article class="media content-section">
+   <div class="media-body">
+    <form method="POST" action="{% url 'approve_service_register'%}">
+      {% csrf_token %}
+      <div class="form-group">
+          <input type="hidden" name="user_id" value="{{user.id}}">
+          <input type="hidden" name="answer" value="True">
+          <input type="hidden" name="item_id" value="{{item.id}}">
+          <input type="hidden" name="author" value="{{item.author_id}}">
+          <p class="article-content"><strong>Service Name: </strong>{{item.title}}</p>
+          <p class="article-content"><strong>Status:</strong> {{item.approved_register}}</p>
+
+          </div>
+  </form>
+
+  
+  </article>
+  {% endfor %}
+  {% if myregisterservice|length is 0 %}
+<div class="alert alert-warning">
+  No registered service found!
+</div>
+  {% endif %}
+</div>
+
+
 <div id="approvals" style="display:none">
   {% for item in registerservice %}
   <article class="media content-section">
@@ -41,17 +70,15 @@
            <button style="color:rgb(29, 177, 15)" class="btn" name="type" value="Approve" type="submit">Approve</button>  
           </div>
   </form>
-    
-     {% if registerservice|length is 0 %}
-<div class="alert alert-warning">
-    <strong>Warning!</strong> There is no event to show
-  </div>
-    {% endif %}
-</div>
+
   
   </article>
-
   {% endfor %}
+  {% if registerservice|length is 0 %}
+<div class="alert alert-warning">
+No pending confirmation!
+</div>
+  {% endif %}
 </div>
 
 
@@ -72,7 +99,7 @@
 {% endfor %}
 {% if object_list|length is 0 %}
 <div class="alert alert-warning">
-    <strong>Warning!</strong> There is no event to show
+ There is no event to show
   </div>
     {% endif %}
 </div>
@@ -94,7 +121,7 @@
     {% endfor %}
     {% if service_list|length is 0 %}
 <div class="alert alert-warning">
-    <strong>Warning!</strong> There is no service to show
+There is no service to show
   </div>
     {% endif %}
 </div>
@@ -104,9 +131,11 @@
         var event = document.getElementById("event");
         var app = document.getElementById("approvals");
         var service = document.getElementById("service");
+        var myservices = document.getElementById("myservices");
         event.style.display = "block";
         service.style.display="none";
         app.style.display = "none";
+        myservices.style.display = "none";
       }
       </script>
     
@@ -115,9 +144,12 @@
             var event = document.getElementById("event");
             var service = document.getElementById("service");
             var app = document.getElementById("approvals");
+            var myservices = document.getElementById("myservices");
             app.style.display = "none";
             event.style.display = "none";
             service.style.display="block";
+            myservices.style.display = "none";
+            
           }
           </script>
      <script>
@@ -125,11 +157,28 @@
           var app = document.getElementById("approvals");
           var service = document.getElementById("service");
           var event = document.getElementById("event");
+          var myservices = document.getElementById("myservices");
           app.style.display = "block";
           event.style.display = "none";
           service.style.display="none";
+          myservices.style.display = "none";
         }
         </script>      
+
+<script>
+  function openMyServices() {
+      var app = document.getElementById("approvals");
+      var service = document.getElementById("service");
+      var event = document.getElementById("event");
+      var myservices = document.getElementById("myservices");
+      app.style.display = "none";
+      event.style.display = "none";
+      service.style.display="none";
+      myservices.style.display = "block";
+      
+    }
+    </script>      
+
 
 {% endblock content %}
 
