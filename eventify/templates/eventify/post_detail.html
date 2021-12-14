@@ -15,14 +15,43 @@
         {% if object.author_id is not user.id %}
         {% now "m-d" as todays_date %}
         {% if  object.eventdate|date:"m-d" > todays_date %}
-        <form method="POST" action="{% url 'register_event' object.id %}">
+        <!-- <form method="POST" action="{% url 'register_event' object.id %}">
             {% csrf_token %}
             <div class="form-group">
                 <input type="hidden" name="user_id" value="{{user.id}}">
             </div>
                  <button class="btn btn-primary" name="post_id" value="{{object.id}}"type="submit">Register</button> 
 
+        </form> -->
+        {% if unRegister|length is not 0 %}  
+        <form method="POST" action="{% url 'unregister_event' object.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="hidden" name="user_id" value="{{user.id}}">
+            </div>
+                 <button style="background-color: brown;"class="btn btn-primary" name="post_id" value="{{object.id}}"type="submit">Cancel Application</button> 
         </form>
+        {% endif %}
+
+        {% if approved|length is 0  and unRegister|length is 0 %}  
+        <form method="POST" action="{% url 'register_event' object.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="hidden" name="user_id" value="{{user.id}}">
+            </div>
+            <button class="btn btn-primary" name="post_id" value="{{object.id}}"type="submit">Apply</button> 
+        </form>
+        {% endif %}
+        <!-- {% if approved|length is not 0 %}  
+        <form method="POST" action="{% url 'register_event' object.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="hidden" name="user_id" value="{{user.id}}">
+            </div>
+            <p  style="background-color:rgb(0, 145, 43);" class="btn btn-primary" name="post_id" value="{{object.id}}"type="submit">Approved<p> 
+          
+        </form>
+        {% endif %} -->
         
         {% else %}
         <div class="alert alert-warning">

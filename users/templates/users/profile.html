@@ -16,8 +16,8 @@
 <div  style="bottom:50%; left:32%">
     <button style="width:24%; background: #5f788a;"onclick="openEvent()" class="btn btn-primary">Events</button>
     <button style="width:24%;background: #5f788a;" onclick="openService()" class="btn btn-primary">Services</button>
-    <button style="width:24%;background: #5f788a;"onclick="openApprovals()" class="btn btn-primary">Approvals</button>
     <button style="width:24%;background: #5f788a;"onclick="openMyServices()" class="btn btn-primary">MyServices</button>
+    <button style="width:24%;background: #5f788a;"onclick="openApprovals()" class="btn btn-primary">Approvals</button>
 </div>
 
 <!-- <button onclick="openEvent()">Event</button>
@@ -34,12 +34,14 @@
           <input type="hidden" name="answer" value="True">
           <input type="hidden" name="item_id" value="{{item.id}}">
           <input type="hidden" name="author" value="{{item.author_id}}">
-          <p class="article-content"><strong>Service Name: </strong>{{item.title}}</p>
+          <h4><a style="color:black;" href="{% url 'service_detail' item.service_id %}"><strong>Service Name: </strong>{{item.title}}</a></h4>
           {% if item.approved_register is True %}
           <p class="article-content"><strong>Status:</strong> Accepted</p>
           {%else%}
           <p class="article-content"><strong>Status:</strong> Pending</p>
+          <button style="background-color:brown;color:white; float: right;" class="btn" name="type" value="Delete" type="submit">Cancel Application</button>
           {% endif %}
+         
           </div>
   </form>
 
@@ -69,8 +71,8 @@
           <p class="article-content"><strong>Applicant:</strong> {{ item.username }}</p>
           <p class="article-content"><strong>Status:</strong> Pending</p>
     
-           <button style="color:brown" class="btn " name="type" value="Delete" type="submit">Reject</button>
-           <button style="color:rgb(29, 177, 15)" class="btn" name="type" value="Approve" type="submit">Approve</button>  
+           <button style="background-color:rgb(204, 16, 16);color:white;" class="btn " name="type" value="Delete" type="submit">Reject</button>
+           <button style="background-color:rgb(0, 145, 43);color:white;" class="btn" name="type" value="Approve" type="submit">Approve</button>  
           </div>
   </form>
 

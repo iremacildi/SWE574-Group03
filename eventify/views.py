@@ -83,6 +83,7 @@ class PostDetailView(DetailView):
         pk=self.kwargs['pk']
         context = super().get_context_data(**kwargs)
         context['registerevent'] = RegisterEvent.objects.filter(post_id=pk,approved_register=True)
+        context['unRegister'] = RegisterEvent.objects.filter(post_id=pk,author_id=self.request.user.id,approved_register=True)
         return context
 
 
@@ -94,6 +95,8 @@ class ServiceDetailView(DetailView):
         pk=self.kwargs['pk']
         context = super().get_context_data(**kwargs)
         context['registerservice'] = RegisterService.objects.filter(service_id=pk,approved_register=True)
+        context['unRegister'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=False)
+        context['approved'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=True)
         return context
 
 
@@ -220,7 +223,20 @@ def register_event(request, pk):
        
     else:
         return redirect('post_detail', pk=pk)
-  
+
+@login_required
+def unregister_event(request, pk):
+    post= get_object_or_404(Post, pk=pk)
+    if request.method == 'POST':
+        ids=request.POST.get('user_id')
+        post_id=request.POST.get('post_id')
+        RegisterEvent.objects.filter(author_id=ids,post_id=post_id).delete()
+        messages.success(request, "Successfully cancelled application")    
+        return redirect('post_detail', pk=pk)
+    else:
+        return redirect('post_detail', pk=pk)
+
+
 @login_required
 def register_service(request, pk):
     service= get_object_or_404(Service, pk=pk)
@@ -253,4 +269,15 @@ def register_service(request, pk):
     else:
         return redirect('service_detail', pk=pk)
 
+@login_required
+def unregister_service(request, pk):
+    service= get_object_or_404(Service, pk=pk)
+    if request.method == 'POST':
+        ids=request.POST.get('user_id')
+        service_id=request.POST.get('service_id')
+        RegisterService.objects.filter(author_id=ids,service_id=service_id).delete()
+        messages.success(request, "Successfully cancelled application")    
+        return redirect('service_detail', pk=pk)
+    else:
+        return redirect('service_detail', pk=pk)
      
