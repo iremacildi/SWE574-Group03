@@ -115,7 +115,7 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title','duration','eventdate','eventtime','capacity','content','picture']
+    fields = ['title','duration','eventdate','eventtime','capacity','location','content','picture']
     widgets = {
             'eventdate':DateInput(attrs={'type': 'date'}),
             'eventtime':TimeInput(attrs={'type': 'time'}),
@@ -133,7 +133,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Service
-    fields = ['title','duration','eventdate','eventtime','capacity','content','picture']
+    fields = ['title','duration','eventdate','eventtime','capacity','location','content','picture']
     widgets = {
             'eventdate':DateInput(attrs={'type': 'date'}),
             'eventtime':TimeInput(attrs={'type': 'time'}),
