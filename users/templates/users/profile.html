@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<div class="content-section">
+<div style="background-color: rgba(193, 230, 205, 0.445);"class="content-section">
     <div class="media">
         <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
         <div class="media-body">
@@ -14,10 +14,10 @@
         <a class="btn btn-info btn-sm mt-1 mb-1 float-right" href="{% url 'editprofile' %}">Update</a>
 </div> 
 <div  style="bottom:50%; left:32%">
-    <button style="width:24%;"onclick="openEvent()" class="btn btn-primary">Events</button>
-    <button style="width:24%;" onclick="openService()" class="btn btn-primary">Services</button>
-    <button style="width:24%;"onclick="openApprovals()" class="btn btn-primary">Approvals</button>
-    <button style="width:24%;"onclick="openMyServices()" class="btn btn-primary">MyServices</button>
+    <button style="width:24%; background: #5f788a;"onclick="openEvent()" class="btn btn-primary">Events</button>
+    <button style="width:24%;background: #5f788a;" onclick="openService()" class="btn btn-primary">Services</button>
+    <button style="width:24%;background: #5f788a;"onclick="openApprovals()" class="btn btn-primary">Approvals</button>
+    <button style="width:24%;background: #5f788a;"onclick="openMyServices()" class="btn btn-primary">MyServices</button>
 </div>
 
 <!-- <button onclick="openEvent()">Event</button>
