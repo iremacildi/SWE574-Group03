@@ -17,6 +17,7 @@ class Post(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     content = models.TextField()
+    location = models.CharField(max_length=50,blank=True)
     eventdate = models.DateField(default=timezone.now)
     eventtime=models.TimeField(blank=True)
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
@@ -47,6 +48,7 @@ class Service(models.Model):
      )
     capacity=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
+    location = models.CharField(max_length=50,blank=True)
     content = models.TextField()
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=True)
     date_posted = models.DateTimeField(default=timezone.now)
