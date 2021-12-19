@@ -34,7 +34,8 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default = '3$!e5*ggej1g%8n!d77u^5jk$qy&_p_
 DEBUG = env('DJANGO_DEBUG', default=True)
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
+# ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
