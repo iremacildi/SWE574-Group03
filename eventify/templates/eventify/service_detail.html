@@ -126,12 +126,11 @@
     </div>
     {% else %}
     <a href="{% url 'login' %}" class="btn btn-success btn-lg btn-block mb-4">
-        Sign In for comment and like the post.
     </a>
     {% endif %}
 
     <!-- Single Comments -->
-    {% for servicecomment in service.servicecomment.all %}
+    {% for servicecomment in object.servicecomment.all %}
     {% if servicecomment.approved_comment %}
     <div class="media mb-4">
         <img class="d-flex mr-3 rounded-circle article-img" src="{{servicecomment.author.profile.image.url }}" alt="">
