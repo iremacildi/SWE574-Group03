@@ -7,7 +7,7 @@ from .models import Post,Service
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title','duration','eventdate','eventtime','location','content','picture','capacity']
+        fields = ['title','duration','eventdate','category','eventtime','location','content','picture','capacity']
 
         widgets = {
             'eventdate':DateInput(attrs={'type': 'date'}),
@@ -17,7 +17,7 @@ class PostForm(forms.ModelForm):
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['title','duration','eventdate','eventtime','location','content','picture','capacity']
+        fields = ['title','duration','eventdate','category','eventtime','location','content','picture','capacity']
 
         widgets = {
             'eventdate':DateInput(attrs={'type': 'date'}),

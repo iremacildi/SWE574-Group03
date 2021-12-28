@@ -57,6 +57,8 @@ def profile(request):
     }
     return render(request, 'users/profile.html', context)
 
+
+
 @login_required
 def editprofile(request):
     if request.method == 'POST':
@@ -91,7 +93,7 @@ def approve_service_register(request):
         accept_delete=request.POST.get('type')
         if accept_delete=='Delete':
             RegisterService.objects.filter(author=user,id=item).delete()
-            messages.success(request, "Successfully rejected")
+            messages.success(request, "Successfully cancelled")
         else:    
             register=RegisterService.objects.get(author=user,id=item)
 

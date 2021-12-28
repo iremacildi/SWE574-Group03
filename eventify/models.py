@@ -6,7 +6,15 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
-
+CATEGORY_CHOICE = (
+    ('Seminar','Seminar'),
+    ('Conference', 'Conference'),
+    ('Workshop','Workshop'),
+    ('Themed parties','Themed party'),
+    ('Webinar','Webinar'),
+    ('Summit','Summit'),
+    ('Music festival','Music festival'),)
+        
 
 def upload_post_to(instance,filename):
 	return f'post_picture/{instance.user.username}/{filename}'
@@ -20,11 +28,13 @@ class Post(models.Model):
     location = models.CharField(max_length=50,blank=True)
     eventdate = models.DateField(default=timezone.now)
     eventtime=models.TimeField(blank=True)
+    category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar')
+
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
     capacity=models.IntegerField(default=1,validators=[MaxValueValidator(100), MinValueValidator(1)]
      )
-    picture = models.ImageField(upload_to='uploads/event_pictures/',blank=True)
+    picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
    
@@ -46,11 +56,12 @@ class Service(models.Model):
     eventtime=models.TimeField(blank=True)
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
+    category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar') 
     capacity=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
     location = models.CharField(max_length=50,blank=True)
     content = models.TextField()
-    picture = models.ImageField(upload_to='uploads/event_pictures/',blank=True)
+    picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
 
@@ -70,7 +81,6 @@ class ServiceComment(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     approved_comment = models.BooleanField(default=True)
 
-
     def approve(self):
         self.approved_comment = True
         self.save()
@@ -80,6 +90,7 @@ class ServiceComment(models.Model):
 
     def __str__(self):
         return self.author
+
 
 class RegisterEvent(models.Model):
     post = models.ForeignKey(Post, related_name='postregister', on_delete=models.CASCADE)
