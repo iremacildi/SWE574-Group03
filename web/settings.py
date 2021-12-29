@@ -99,8 +99,8 @@ DATABASES = {
         'NAME': env('DB_NAME', default='eventifyDb'), 
         'USER': env('DB_USER', default='postgres'), 
         'PASSWORD': env('DB_PASSWORD', default='Pass1234'),
-        # 'HOST': env('DB_HOST', default='127.0.0.1'), 
-        'HOST': env('DB_HOST'), 
+        'HOST': env('DB_HOST', default='127.0.0.1'), 
+        # 'HOST': env('DB_HOST'), 
         'PORT': env('DB_PORT', default='5432'),
     }
     # 'default': {

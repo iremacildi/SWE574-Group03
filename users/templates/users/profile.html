@@ -94,7 +94,7 @@ No pending confirmation!
  <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
  <div class="media-body">
    <div class="article-metadata">
-     <a class="mr-2" href="{% url 'user_posts' post.author.username %}">{{ post.author }}</a>
+     <a class="mr-2" href="{% url 'profiledetail' post.author.username %}">{{ post.author }}</a>
      <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
    </div>
  <h2><a class="article-title" href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h2>
@@ -115,7 +115,7 @@ No pending confirmation!
       <img class="rounded-circle article-img" src="{{ service.author.profile.image.url }}">
       <div class="media-body">
         <div class="article-metadata">
-          <a class="mr-2" href="{% url 'user_services' service.author.username %}">{{ service.author }}</a>
+          <a class="mr-2" href="{% url 'profiledetail' service.author.username %}">{{ service.author }}</a>
           <small class="text-muted">{{ service.date_posted|date:"F d, Y" }}</small>
         </div>
       <h2><a class="article-title" href="{% url 'service_detail' service.pk %}">{{ service.title }}</a></h2>

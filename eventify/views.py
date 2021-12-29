@@ -1,6 +1,6 @@
 from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
-from .models import Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent
+from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent
 from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -54,25 +54,25 @@ class ServiceListView(ListView):
             object_list = self.model.objects.all()
         return object_list
 
-class UserPostListView(ListView):
-    model = Post
-    template_name = 'eventify/user_posts.html'
-    context_object_name = 'posts'
-    paginate_by = 5
+class UserListView(ListView):
+    model = User
+    template_name = 'eventify/profiledetail.html'
+    context_object_name = 'object'
+
 
     def get_queryset(self):
         user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(author=user).order_by('-date_posted')
+        return User.objects.get(id=user.id)
 
-class UserServiceListView(ListView):
-    model = Service
-    template_name = 'eventify/user_services.html'
-    context_object_name = 'services'
-    paginate_by = 5
+# class UserServiceListView(ListView):
+#     model = Service
+#     template_name = 'eventify/user_services.html'
+#     context_object_name = 'services'
+#     paginate_by = 5
 
-    def get_queryset(self):
-        user = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Service.objects.filter(author=user).order_by('-date_posted')
+#     def get_queryset(self):
+#         user = get_object_or_404(User, username=self.kwargs.get('username'))
+#         return Service.objects.filter(author=user).order_by('-date_posted')
     
 
 class PostDetailView(DetailView):
@@ -136,7 +136,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Service
-    fields = ['title','duration','eventdate','eventtime','capacity','location','content','picture']
+    fields = ['title','duration','eventdate','category','eventtime','capacity','location','content','picture']
     widgets = {
             'eventdate':DateInput(attrs={'type': 'date'}),
             'eventtime':TimeInput(attrs={'type': 'time'}),
@@ -280,4 +280,13 @@ def unregister_service(request, pk):
         return redirect('service_detail', pk=pk)
     else:
         return redirect('service_detail', pk=pk)
-     
+
+# @login_required
+# def addfriend(request, pk):
+#     if request.method == 'POST':
+#         ids=request.POST.get('user_id')
+#         AddFriend(user=pk,friend=ids).save()
+#         messages.success(request, "Successfully cancelled application")    
+#         return redirect('service_detail', pk=pk)
+#     else:
+#         return redirect('service_detail', pk=pk)     
