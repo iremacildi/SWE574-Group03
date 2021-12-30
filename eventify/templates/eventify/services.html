@@ -8,7 +8,7 @@
     <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">
 </form> 
     {% for service in services %}
-        <article  style="background-color:rgba(193, 230, 205, 0.445);" class="media content-section">
+        <article  class="media content-section">
           <img class="rounded-circle article-img" src="{{ service.author.profile.image.url }}">
           <div class="media-body">
             <div class="article-metadata">
@@ -17,6 +17,11 @@
             </div>
           <h2><a class="article-title" href="{% url 'service_detail' service.pk %}">{{ service.title }}</a></h2>
             <p class="article-content">{{ service.content|safe }}</p>
+            <p ><strong>Duration: </strong> {{ service.duration }} Hours </p>
+            <p ><strong>Location: </strong> {{ service.location }} </p>
+          </div>
+          <div style="border-radius: 5px;"name="tags">
+            {{service.category}}    
           </div>
         </article>
     {% endfor %}
@@ -39,4 +44,12 @@
         <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
       {% endif %}
     {% endif %}
+    <script>
+      var getElm = document.getElementsByName('tags');
+      for(var i = 0, l = getElm.length; i < l; i++) {
+        console.log("i=",i)
+        var randomColor = Math.floor(Math.random() * 16777215).toString(16);
+        getElm[i].style.background = '#' + randomColor;
+      }
+    </script>
 {% endblock content %}
