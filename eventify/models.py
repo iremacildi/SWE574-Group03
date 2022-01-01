@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
+from location_field.models.plain import PlainLocationField
 
 
 CATEGORY_CHOICE = (
@@ -25,7 +26,8 @@ class Post(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     content = models.TextField()
-    location = models.CharField(max_length=50,blank=True)
+    location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
+    content = models.TextField()
     eventdate = models.DateField(default=timezone.now)
     eventtime=models.TimeField(blank=True)
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar')
@@ -59,7 +61,7 @@ class Service(models.Model):
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar') 
     capacity=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
-    location = models.CharField(max_length=50,blank=True)
+    location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
     content = models.TextField()
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
