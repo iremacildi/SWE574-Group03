@@ -7,7 +7,8 @@ from location_field.models.plain import PlainLocationField
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
-    address = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
+    location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
+    address=models.TextField(blank=True)
     credits=models.IntegerField(default=6)
 
     def __str__(self):

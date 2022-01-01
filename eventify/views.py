@@ -19,7 +19,7 @@ from django.views.generic import (
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
 
-class PostListView(ListView):
+class PostListView(LoginRequiredMixin,ListView):
     model = Post
     template_name = 'eventify/index.html'
     context_object_name = 'posts'
@@ -36,16 +36,15 @@ class PostListView(ListView):
         else:
             object_list = self.model.objects.all()
         for item in object_list:
-          item.tempLocation=round(geodesic(item.location, self.request.user.profile.address).km,2)    
+          item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)    
         return object_list
 
-class ServiceListView(ListView):
+class ServiceListView(LoginRequiredMixin,ListView):
     model = Service
     template_name = 'eventify/services.html'
     context_object_name = 'services'
     paginate_by = 5
-    geolocator = Nominatim(user_agent="arcan")
-    location = geolocator.reverse("52.509669, 13.376294")
+
     def get_queryset(self):
         try:
             keyword = self.request.GET['q']
@@ -58,7 +57,7 @@ class ServiceListView(ListView):
             object_list = self.model.objects.all()
 
         for item in object_list:
-            item.tempLocation=round(geodesic(item.location, self.request.user.profile.address).km,2)
+            item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
             
         return object_list
 
@@ -88,10 +87,14 @@ class PostDetailView(LoginRequiredMixin,DetailView):
     model = Post
 
     def get_context_data(self, **kwargs):
+        geolocator = Nominatim(user_agent="arcan")
         pk=self.kwargs['pk']
         context = super().get_context_data(**kwargs)
+        event=Post.objects.get(id=pk)
+        location = geolocator.reverse(event.location)
         context['registerevent'] = RegisterEvent.objects.filter(post_id=pk,approved_register=True)
         context['unRegister'] = RegisterEvent.objects.filter(post_id=pk,author_id=self.request.user.id,approved_register=True)
+        context['address']=location.address
         return context
 
 
@@ -101,10 +104,14 @@ class ServiceDetailView(LoginRequiredMixin,DetailView):
 
     def get_context_data(self, **kwargs):
         pk=self.kwargs['pk']
+        geolocator = Nominatim(user_agent="arcan")
+        service=Service.objects.get(id=pk)
+        location = geolocator.reverse(service.location)
         context = super().get_context_data(**kwargs)
         context['registerservice'] = RegisterService.objects.filter(service_id=pk,approved_register=True)
         context['unRegister'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=False)
         context['approved'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=True)
+        context['address']=location.address
         return context
 
 
