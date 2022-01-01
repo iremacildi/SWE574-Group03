@@ -16,7 +16,8 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-
+from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
 
 class PostListView(ListView):
     model = Post
@@ -34,6 +35,8 @@ class PostListView(ListView):
                 Q(content__icontains=keyword) | Q(title__icontains=keyword)|Q(category__icontains=keyword))
         else:
             object_list = self.model.objects.all()
+        for item in object_list:
+          item.tempLocation=round(geodesic(item.location, self.request.user.profile.address).km,2)    
         return object_list
 
 class ServiceListView(ListView):
@@ -41,7 +44,8 @@ class ServiceListView(ListView):
     template_name = 'eventify/services.html'
     context_object_name = 'services'
     paginate_by = 5
-
+    geolocator = Nominatim(user_agent="arcan")
+    location = geolocator.reverse("52.509669, 13.376294")
     def get_queryset(self):
         try:
             keyword = self.request.GET['q']
@@ -52,6 +56,10 @@ class ServiceListView(ListView):
                 Q(content__icontains=keyword) | Q(title__icontains=keyword)|Q(category__icontains=keyword))
         else:
             object_list = self.model.objects.all()
+
+        for item in object_list:
+            item.tempLocation=round(geodesic(item.location, self.request.user.profile.address).km,2)
+            
         return object_list
 
 class UserListView(ListView):
@@ -75,7 +83,7 @@ class UserListView(ListView):
 #         return Service.objects.filter(author=user).order_by('-date_posted')
     
 
-class PostDetailView(DetailView):
+class PostDetailView(LoginRequiredMixin,DetailView):
     context_object_name = 'object'
     model = Post
 
@@ -87,7 +95,7 @@ class PostDetailView(DetailView):
         return context
 
 
-class ServiceDetailView(DetailView):
+class ServiceDetailView(LoginRequiredMixin,DetailView):
     context_object_name = 'object'
     model = Service
 

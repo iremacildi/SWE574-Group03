@@ -28,6 +28,7 @@ class Post(models.Model):
     content = models.TextField()
     location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
     content = models.TextField()
+    tempLocation = models.TextField(blank=True)
     eventdate = models.DateField(default=timezone.now)
     eventtime=models.TimeField(blank=True)
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar')
@@ -55,6 +56,7 @@ class Service(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     eventdate = models.DateField(default=timezone.now)
+    tempLocation = models.TextField(blank=True)
     eventtime=models.TimeField(blank=True)
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )

@@ -18,7 +18,7 @@
           <h2><a class="article-title" href="{% url 'service_detail' service.pk %}">{{ service.title }}</a></h2>
             <p class="article-content">{{ service.content|safe }}</p>
             <p ><strong>Duration: </strong> {{ service.duration }} Hours </p>
-            <p ><strong>Location: </strong> {{ service.location }} </p>
+            <p ><strong>Far Away </strong>  {{service.tempLocation }} KM </p>
           </div>
           <div style="border-radius: 5px;" class="tags" name="{{service.category}}">
             {{service.category}}    

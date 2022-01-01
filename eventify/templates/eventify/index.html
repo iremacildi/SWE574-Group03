@@ -18,7 +18,7 @@
           <h2><a class="article-title" href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h2>
             <p class="article-content">{{ post.content|safe }}</p>
             <p ><strong>Duration: </strong> {{ post.duration }} Hours </p>
-            <p ><strong>Location: </strong> {{ post.location }} </p>
+            <p ><strong>Far Away </strong>  {{post.tempLocation }} KM </p>
           </div>
           <div style="border-radius: 5px;" class="tags" name="{{post.category}}">
             {{post.category}}    
