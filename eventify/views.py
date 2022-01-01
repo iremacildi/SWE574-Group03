@@ -31,7 +31,7 @@ class PostListView(ListView):
             keyword = ''
         if (keyword != ''):
             object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword))
+                Q(content__icontains=keyword) | Q(title__icontains=keyword)|Q(category__icontains=keyword))
         else:
             object_list = self.model.objects.all()
         return object_list
@@ -49,7 +49,7 @@ class ServiceListView(ListView):
             keyword = ''
         if (keyword != ''):
             object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword))
+                Q(content__icontains=keyword) | Q(title__icontains=keyword)|Q(category__icontains=keyword))
         else:
             object_list = self.model.objects.all()
         return object_list

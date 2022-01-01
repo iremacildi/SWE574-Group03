@@ -20,7 +20,7 @@
             <p ><strong>Duration: </strong> {{ service.duration }} Hours </p>
             <p ><strong>Location: </strong> {{ service.location }} </p>
           </div>
-          <div style="border-radius: 5px;"name="tags">
+          <div style="border-radius: 5px;" class="tags" name="{{service.category}}">
             {{service.category}}    
           </div>
         </article>
@@ -45,11 +45,29 @@
       {% endif %}
     {% endif %}
     <script>
-      var getElm = document.getElementsByName('tags');
+      var getElm = document.getElementsByClassName('tags');
       for(var i = 0, l = getElm.length; i < l; i++) {
-        console.log("i=",i)
-        var randomColor = Math.floor(Math.random() * 16777215).toString(16);
-        getElm[i].style.background = '#' + randomColor;
-      }
+       if(getElm[i].getAttribute('name')=='Seminar'){
+        getElm[i].style.background = '#7FFF00';
+        }
+        if(getElm[i].getAttribute('name')=='Conference'){
+        getElm[i].style.background = '#00CED1';
+        }
+        if(getElm[i].getAttribute('name')=='Workshop'){
+        getElm[i].style.background = '#87CEFA';
+        }
+        if(getElm[i].getAttribute('name')=='Themed parties'){
+        getElm[i].style.background = '#FF6347';
+        }
+        if(getElm[i].getAttribute('name')=='Webinar'){
+        getElm[i].style.background = '#FFFF00';
+        }
+        if(getElm[i].getAttribute('name')=='Summit'){
+        getElm[i].style.background = '#B0E0E6';
+        }
+        if(getElm[i].getAttribute('name')=='Music festival'){
+        getElm[i].style.background = '#FFA07A';
+        }
+    }
     </script>
 {% endblock content %}
