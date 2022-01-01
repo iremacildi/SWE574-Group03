@@ -104,6 +104,7 @@
     <p class="lead"><strong>Capacity: </strong>{{ object.capacity}} People</p>
 
     <div>
+        <strong>Location: </strong>
         <input style="visibility: hidden; height: 0px; margin: 0px;" type="text" 
         name="location" value={{ object.location }} required id="id_location" 
         data-location-field-options="{&quot;map.provider&quot;: &quot;google&quot;, &quot;map.zoom&quot;: 13, 
@@ -119,7 +120,7 @@
             &quot;provider.google.map.type&quot;: &quot;ROADMAP&quot;, &quot;field_options&quot;: 
             {&quot;based_fields&quot;: [], &quot;prefix&quot;: &quot;&quot;}}">
         <div class="map-widget" style="margin-top: 4px">
-            <div id="map_location" style="width: 500px; height: 250px"></div>
+            <div id="map_location" style="width: 880px; height: 250px"></div>
         </div>
     </div>
 

@@ -87,8 +87,27 @@
     <p class="lead"><strong>Category: </strong>{{ object.category}} </p>
     <p class="lead"><strong>Start Time: </strong> {{ object.eventtime}} </p>
     <p class="lead"><strong>Duration: </strong> {{ object.duration}} Hours</p>
-    <p class="lead"><strong>Location: </strong> {{ object.location}}</p>
     <p class="lead"><strong>Capacity: </strong>{{ object.capacity}} People</p>
+    <div>
+        <strong>Location: </strong>
+        <input style="visibility: hidden; height: 0px; margin: 0px;" type="text" 
+        name="location" value={{ object.location }} required id="id_location" 
+        data-location-field-options="{&quot;map.provider&quot;: &quot;google&quot;, &quot;map.zoom&quot;: 13, 
+            &quot;search.provider&quot;: &quot;google&quot;, &quot;search.suffix&quot;: &quot;&quot;, 
+            &quot;provider.google.api&quot;: &quot;//maps.google.com/maps/api/js?sensor=false&quot;, 
+            &quot;provider.google.api_key&quot;: &quot;AIzaSyCnZOziNKACqM7Q231fvGPtTJDxhqHe7ow&quot;, 
+            &quot;provider.google.map_type&quot;: &quot;ROADMAP&quot;, &quot;provider.mapbox.access_token&quot;: 
+            &quot;&quot;, &quot;provider.mapbox.max_zoom&quot;: 18, &quot;provider.mapbox.id&quot;: 
+            &quot;mapbox.streets&quot;, &quot;provider.openstreetmap.max_zoom&quot;: 18, 
+            &quot;resources.root_path&quot;: &quot;/static/location_field&quot;, &quot;resources.media&quot;: 
+            {&quot;js&quot;: [&quot;/static/location_field/js/form.js&quot;]}, 
+            &quot;provider.google.api_libraries&quot;: &quot;&quot;, 
+            &quot;provider.google.map.type&quot;: &quot;ROADMAP&quot;, &quot;field_options&quot;: 
+            {&quot;based_fields&quot;: [], &quot;prefix&quot;: &quot;&quot;}}">
+        <div class="map-widget" style="margin-top: 4px">
+            <div id="map_location" style="width: 880px; height: 250px"></div>
+        </div>
+    </div>
     <hr>
     <p class="lead"><strong>Already Enrolled: </strong> {{ registerevent|length}} </p>
     
