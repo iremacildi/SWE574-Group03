@@ -17,7 +17,7 @@
       <option value="Summit">Summit</option>
       <option value="Music festival">Music festival</option>
     </select>
-
+    {% if user.is_authenticated %}
     <label class="form-control" for="cars">Search by Distance: </label>
     <select class="form-control" name="km" id="cars">
       <option value="all">All Ranges</option>
@@ -26,8 +26,8 @@
       <option value="5.0">Inside Range 5KM</option>
       <option value="10.0">Inside Range 10KM</option>
       <option value="20.0">Inside Range 20KM</option>
-
     </select>
+    {% endif %}
     <input class="btn btn-outline-success my-2 my-sm-0" style="margin-left:20px"type="submit" value="Search">
 </form> 
     {% for service in services %}
@@ -41,7 +41,7 @@
           <h2><a class="article-title" href="{% url 'service_detail' service.pk %}">{{ service.title }}</a></h2>
             <p class="article-content">{{ service.content|safe }}</p>
             <p ><strong>Duration: </strong> {{ service.duration }} Hours </p>
-            <p ><strong>Far Away </strong>  {{service.tempLocation }} KM </p>
+            <p ><strong>Far Away: </strong>  {{service.tempLocation }}</p>
           </div>
           <div style="border-radius: 5px;" class="tags" name="{{service.category}}">
             {{service.category}}    

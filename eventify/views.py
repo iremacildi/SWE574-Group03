@@ -21,7 +21,7 @@ from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
 from datetime import date
 
-class PostListView(LoginRequiredMixin,ListView):
+class PostListView(ListView):
     model = Post
     template_name = 'eventify/index.html'
     context_object_name = 'posts'
@@ -50,9 +50,12 @@ class PostListView(LoginRequiredMixin,ListView):
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
-
+            
         for item in object_list:
-          item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
+            try:
+                item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
+            except:
+                item.tempLocation="Not calculated yet"     
 
         if km!='all':
             for item in object_list:
@@ -61,7 +64,7 @@ class PostListView(LoginRequiredMixin,ListView):
             return my_list
         else:
             return object_list
-class ServiceListView(LoginRequiredMixin,ListView):
+class ServiceListView(ListView):
     model = Service
     template_name = 'eventify/services.html'
     context_object_name = 'services'
@@ -92,7 +95,10 @@ class ServiceListView(LoginRequiredMixin,ListView):
             object_list = self.model.objects.all()
 
         for item in object_list:
-            item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
+            try:
+                item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
+            except:
+                item.tempLocation="Not calculated yet"    
             
         if km!='all':
             for item in object_list:
