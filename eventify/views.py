@@ -37,6 +37,7 @@ class PostListView(ListView):
             keyword = ''
             cat='all'
             km='all'
+
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword))
@@ -50,7 +51,7 @@ class PostListView(ListView):
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
-            
+
         for item in object_list:
             try:
                 item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
@@ -64,6 +65,7 @@ class PostListView(ListView):
             return my_list
         else:
             return object_list
+
 class ServiceListView(ListView):
     model = Service
     template_name = 'eventify/services.html'

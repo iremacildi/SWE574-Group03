@@ -106,7 +106,7 @@ DATABASES = {
 
       'default': {
         'ENGINE': env('DB_ENGINE', default = 'django.db.backends.postgresql_psycopg2'),
-        'NAME': env('DB_NAME', default='eventifyDb'), 
+        'NAME': env('DB_NAME', default='eventifydb'), 
         'USER': env('DB_USER', default='postgres'), 
         'PASSWORD': env('DB_PASSWORD', default='Pass1234'),
         'HOST': env('DB_HOST', default='127.0.0.1'), 
