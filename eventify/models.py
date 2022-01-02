@@ -12,10 +12,10 @@ CATEGORY_CHOICE = (
     ('Seminar','Seminar'),
     ('Conference', 'Conference'),
     ('Workshop','Workshop'),
-    ('Themed_parties','Themed party'),
+    ('Themed party','Themed Party'),
     ('Webinar','Webinar'),
     ('Summit','Summit'),
-    ('Music festival','Music festival'),)
+    ('Music festival','Music Festival'),)
         
 
 def upload_post_to(instance,filename):
@@ -31,7 +31,7 @@ class Post(models.Model):
     content = models.TextField()
     tempLocation = models.TextField(blank=True)
     eventdate = models.DateField(default=timezone.now)
-    eventtime=models.TimeField(blank=True)
+    eventtime=models.TimeField()
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar')
 
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
@@ -59,7 +59,7 @@ class Service(models.Model):
     title = models.CharField(max_length=100)
     eventdate = models.DateField(default=timezone.now)
     tempLocation = models.TextField(blank=True)
-    eventtime=models.TimeField(blank=True)
+    eventtime=models.TimeField()
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar') 

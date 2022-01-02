@@ -12,14 +12,14 @@
       <option value="Seminar">Seminar</option>
       <option value="Conference">Conference</option>
       <option value="Workshop">Workshop</option>
-      <option value="Themed_parties">Themed party</option>
+      <option value="Themed party">Themed party</option>
       <option value="Webinar">Webinar</option>
       <option value="Summit">Summit</option>
       <option value="Music festival">Music festival</option>
     </select>
     {% if user.is_authenticated %}
     <label class="form-control" for="cars">Search by Distance: </label>
-    <select class="form-control" name="km" id="cars">
+    <select class="form-control" name="km" id="ranges">
       <option value="all">All Ranges</option>
       <option value="1.0">Inside Range 1KM</option>
       <option value="2.0">Inside Range 2KM</option>
@@ -41,7 +41,7 @@
           <h2><a class="article-title" href="{% url 'service_detail' service.pk %}">{{ service.title }}</a></h2>
             <p class="article-content">{{ service.content|safe }}</p>
             <p ><strong>Duration: </strong> {{ service.duration }} Hours </p>
-            <p ><strong>Far Away: </strong>  {{service.tempLocation }}</p>
+            <p ><strong>Distance (KM): {{service.tempLocation }}</strong></p>
           </div>
           <div style="border-radius: 5px;" class="tags" name="{{service.category}}">
             {{service.category}}    
@@ -79,7 +79,7 @@
         if(getElm[i].getAttribute('name')=='Workshop'){
         getElm[i].style.background = '#87CEFA';
         }
-        if(getElm[i].getAttribute('name')=='Themed_parties'){
+        if(getElm[i].getAttribute('name')=='Themed party'){
         getElm[i].style.background = '#FF6347';
         }
         if(getElm[i].getAttribute('name')=='Webinar'){

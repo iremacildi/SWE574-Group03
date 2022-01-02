@@ -12,7 +12,7 @@
     <option value="Seminar">Seminar</option>
     <option value="Conference">Conference</option>
     <option value="Workshop">Workshop</option>
-    <option value="Themed_parties">Themed party</option>
+    <option value="Themed party">Themed party</option>
     <option value="Webinar">Webinar</option>
     <option value="Summit">Summit</option>
     <option value="Music festival">Music festival</option>
@@ -41,7 +41,7 @@
           <h2><a class="article-title" href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h2>
             <p class="article-content">{{ post.content|safe }}</p>
             <p ><strong>Duration: </strong> {{ post.duration }} Hours </p>
-            <p ><strong>Far Away: </strong>  {{post.tempLocation }} </p>
+            <p ><strong>Distance (KM): {{post.tempLocation }}</strong></p>
           </div>
           <div style="border-radius: 5px;" class="tags" name="{{post.category}}">
             {{post.category}}    
@@ -81,7 +81,7 @@
         if(getElm[i].getAttribute('name')=='Workshop'){
         getElm[i].style.background = '#87CEFA';
         }
-        if(getElm[i].getAttribute('name')=='Themed parties'){
+        if(getElm[i].getAttribute('name')=='Themed party'){
         getElm[i].style.background = '#FF6347';
         }
         if(getElm[i].getAttribute('name')=='Webinar'){
