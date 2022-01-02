@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.fields import BooleanField
 from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
@@ -11,7 +12,7 @@ CATEGORY_CHOICE = (
     ('Seminar','Seminar'),
     ('Conference', 'Conference'),
     ('Workshop','Workshop'),
-    ('Themed parties','Themed party'),
+    ('Themed_parties','Themed party'),
     ('Webinar','Webinar'),
     ('Summit','Summit'),
     ('Music festival','Music festival'),)
@@ -28,6 +29,7 @@ class Post(models.Model):
     content = models.TextField()
     location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
     content = models.TextField()
+    tempLocation = models.TextField(blank=True)
     eventdate = models.DateField(default=timezone.now)
     eventtime=models.TimeField(blank=True)
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar')
@@ -39,6 +41,7 @@ class Post(models.Model):
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
+    isLate=BooleanField(default=False)
    
 
     class Meta:
@@ -55,6 +58,7 @@ class Service(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     eventdate = models.DateField(default=timezone.now)
+    tempLocation = models.TextField(blank=True)
     eventtime=models.TimeField(blank=True)
     duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
      )
@@ -66,6 +70,8 @@ class Service(models.Model):
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
+    isLate=BooleanField(default=False)
+ 
 
     class Meta:
         ordering = ('-date_posted', )

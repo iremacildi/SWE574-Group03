@@ -1,3 +1,4 @@
+import django
 from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
 from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent
@@ -16,43 +17,90 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
+from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
+from datetime import date
 
-
-class PostListView(ListView):
+class PostListView(LoginRequiredMixin,ListView):
     model = Post
     template_name = 'eventify/index.html'
     context_object_name = 'posts'
     paginate_by = 5
 
     def get_queryset(self):
+        my_list = []
         try:
             keyword = self.request.GET['q']
+            cat = self.request.GET['cat']
+            km=self.request.GET['km']
         except:
             keyword = ''
-        if (keyword != ''):
+            cat='all'
+            km='all'
+        if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword)|Q(category__icontains=keyword))
-        else:
+                Q(content__icontains=keyword) | Q(title__icontains=keyword))
+      
+        elif keyword == '' and cat!="all":
+            object_list = self.model.objects.filter(category=cat)
+                    
+        elif keyword != '' and cat!="all":
+            object_list = self.model.objects.filter(
+                Q(content__icontains=keyword) | Q(title__icontains=keyword) & Q(category__icontains=cat))
+                
+        elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
-        return object_list
 
-class ServiceListView(ListView):
+        for item in object_list:
+          item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
+
+        if km!='all':
+            for item in object_list:
+                if item.tempLocation<float(km):
+                    my_list.append(item)
+            return my_list
+        else:
+            return object_list
+class ServiceListView(LoginRequiredMixin,ListView):
     model = Service
     template_name = 'eventify/services.html'
     context_object_name = 'services'
     paginate_by = 5
 
     def get_queryset(self):
+        my_list = []
         try:
             keyword = self.request.GET['q']
+            cat = self.request.GET['cat']
+            km=self.request.GET['km']
         except:
             keyword = ''
-        if (keyword != ''):
+            cat='all'
+            km='all'
+        if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword)|Q(category__icontains=keyword))
-        else:
+                Q(content__icontains=keyword) | Q(title__icontains=keyword))
+      
+        elif keyword == '' and cat!="all":
+            object_list = self.model.objects.filter(category=cat)
+                    
+        elif keyword != '' and cat!="all":
+            object_list = self.model.objects.filter(
+                (Q(content__icontains=keyword) | Q(title__icontains=keyword)) & Q(category__icontains=cat))
+
+        elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
-        return object_list
+
+        for item in object_list:
+            item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
+            
+        if km!='all':
+            for item in object_list:
+                if item.tempLocation<float(km):
+                    my_list.append(item)
+            return my_list
+        else:
+            return object_list
 
 class UserListView(ListView):
     model = User
@@ -75,28 +123,43 @@ class UserListView(ListView):
 #         return Service.objects.filter(author=user).order_by('-date_posted')
     
 
-class PostDetailView(DetailView):
+class PostDetailView(LoginRequiredMixin,DetailView):
     context_object_name = 'object'
     model = Post
 
     def get_context_data(self, **kwargs):
+        geolocator = Nominatim(user_agent="arcan")
         pk=self.kwargs['pk']
         context = super().get_context_data(**kwargs)
+        event=Post.objects.get(id=pk)
+        if event.eventdate < date.today():
+            event.isLate=True
+        location = geolocator.reverse(event.location)
         context['registerevent'] = RegisterEvent.objects.filter(post_id=pk,approved_register=True)
         context['unRegister'] = RegisterEvent.objects.filter(post_id=pk,author_id=self.request.user.id,approved_register=True)
+        context['address']=location.address
+        context['isLate']=event.isLate
         return context
 
 
-class ServiceDetailView(DetailView):
+class ServiceDetailView(LoginRequiredMixin,DetailView):
     context_object_name = 'object'
     model = Service
 
     def get_context_data(self, **kwargs):
         pk=self.kwargs['pk']
+        geolocator = Nominatim(user_agent="arcan")
+        service=Service.objects.get(id=pk)
+        if service.eventdate < date.today():
+            service.isLate=True
+
+        location = geolocator.reverse(service.location)
         context = super().get_context_data(**kwargs)
         context['registerservice'] = RegisterService.objects.filter(service_id=pk,approved_register=True)
         context['unRegister'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=False)
         context['approved'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=True)
+        context['address']=location.address
+        context['isLate']=service.isLate
         return context
 
 

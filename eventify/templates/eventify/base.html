@@ -1,7 +1,8 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-
+  <link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
+  <script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
 <head>
 
   <!-- Required meta tags -->
@@ -118,19 +119,14 @@
       </div>
     </nav>
   </header>
-  <main id="main" role="main" class="container">
+  <main  role="main" class="container">
     <div class="row">
       <div class="col-md-10">
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-          {{ message }}
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% block content %}{% endblock %}
+        {% block content %} 
+        {% endblock %}
       </div>
       <div class="col-md-4">
+      
         <div id="mySidenav" class="sidenav">
           <a class="nav-item nav-link" href="#"></a>
           <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>

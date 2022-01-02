@@ -6,7 +6,7 @@ import users
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from eventify.models import Post, RegisterEvent, RegisterService,Service
 from .models import Profile
-
+from geopy.geocoders import Nominatim
 
 
 def register(request):
@@ -25,6 +25,7 @@ def register(request):
 
 @login_required
 def profile(request):
+    geolocator = Nominatim(user_agent="arcan")
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
 
@@ -45,6 +46,7 @@ def profile(request):
         service_list=Service.objects.filter(author_id=request.user.id).order_by('-date_posted')
         registerservice=RegisterService.objects.filter(owner=request.user.id,approved_register=False)
         myregisterservice=RegisterService.objects.filter(author_id=request.user.id)
+        location = geolocator.reverse(profile.location)
 
     context = {
         'u_form': u_form,
@@ -52,6 +54,7 @@ def profile(request):
         'object_list':post_list,
         'service_list':service_list,
         'credits':profile.credits,
+        'address':location.address,
         'registerservice':registerservice,
         'myregisterservice':myregisterservice
     }

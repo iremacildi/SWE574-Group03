@@ -4,9 +4,31 @@
 <!-- Search Form -->
 <header><h1>Events</h1></header>
 <form class="form-inline my-2 my-lg-0 pb-2">
-    <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search" aria-label="Search" style="width: 400px">
-    <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Search">
-</form> 
+  <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search by keyword" aria-label="Search" style="width: 170px">
+ 
+  <label class="form-control" for="cars">Search by Tag: </label>
+  <select class="form-control mr-sm-2" name="cat" id="cat">
+    <option value="all">All</option>
+    <option value="Seminar">Seminar</option>
+    <option value="Conference">Conference</option>
+    <option value="Workshop">Workshop</option>
+    <option value="Themed_parties">Themed party</option>
+    <option value="Webinar">Webinar</option>
+    <option value="Summit">Summit</option>
+    <option value="Music festival">Music festival</option>
+  </select>
+
+  <label class="form-control" for="cars">Search by Distance: </label>
+  <select class="form-control" name="km" id="cars">
+    <option value="all">All Ranges</option>
+    <option value="1.0">Inside Range 1KM</option>
+    <option value="2.0">Inside Range 2KM</option>
+    <option value="5.0">Inside Range 5KM</option>
+    <option value="20.0">Inside Range 20KM</option>
+
+  </select>
+  <input class="btn btn-outline-success my-2 my-sm-0" style="margin-left:20px"type="submit" value="Search">
+</form>  
     {% for post in posts %}
         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
@@ -18,7 +40,7 @@
           <h2><a class="article-title" href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h2>
             <p class="article-content">{{ post.content|safe }}</p>
             <p ><strong>Duration: </strong> {{ post.duration }} Hours </p>
-            <p ><strong>Location: </strong> {{ post.location }} </p>
+            <p ><strong>Far Away </strong>  {{post.tempLocation }} KM </p>
           </div>
           <div style="border-radius: 5px;" class="tags" name="{{post.category}}">
             {{post.category}}    
