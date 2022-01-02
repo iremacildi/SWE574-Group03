@@ -11,7 +11,7 @@ CATEGORY_CHOICE = (
     ('Seminar','Seminar'),
     ('Conference', 'Conference'),
     ('Workshop','Workshop'),
-    ('Themed parties','Themed party'),
+    ('Themed_parties','Themed party'),
     ('Webinar','Webinar'),
     ('Summit','Summit'),
     ('Music festival','Music festival'),)

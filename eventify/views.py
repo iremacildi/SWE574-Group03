@@ -28,17 +28,36 @@ class PostListView(LoginRequiredMixin,ListView):
     def get_queryset(self):
         try:
             keyword = self.request.GET['q']
+            cat = self.request.GET['cat']
+            km=self.request.GET['km']
         except:
             keyword = ''
-        if (keyword != ''):
+            cat='all'
+            km='all'
+        if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword)|Q(category__icontains=keyword))
-        else:
+                Q(content__icontains=keyword) | Q(title__icontains=keyword))
+      
+        elif keyword == '' and cat!="all":
+            object_list = self.model.objects.filter(category=cat)
+                    
+        elif keyword != '' and cat!="all":
+            object_list = self.model.objects.filter(
+                Q(content__icontains=keyword) | Q(title__icontains=keyword) & Q(category__icontains=cat))
+                
+        elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
-        for item in object_list:
-          item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)    
-        return object_list
 
+        for item in object_list:
+          item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
+
+        if km!='all':
+            for item in object_list:
+                if item.tempLocation<float(km):
+                    my_list.append(item)
+            return my_list
+        else:
+            return object_list
 class ServiceListView(LoginRequiredMixin,ListView):
     model = Service
     template_name = 'eventify/services.html'
@@ -46,20 +65,39 @@ class ServiceListView(LoginRequiredMixin,ListView):
     paginate_by = 5
 
     def get_queryset(self):
+        my_list = []
         try:
             keyword = self.request.GET['q']
+            cat = self.request.GET['cat']
+            km=self.request.GET['km']
         except:
             keyword = ''
-        if (keyword != ''):
+            cat='all'
+            km='all'
+        if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword)|Q(category__icontains=keyword))
-        else:
+                Q(content__icontains=keyword) | Q(title__icontains=keyword))
+      
+        elif keyword == '' and cat!="all":
+            object_list = self.model.objects.filter(category=cat)
+                    
+        elif keyword != '' and cat!="all":
+            object_list = self.model.objects.filter(
+                (Q(content__icontains=keyword) | Q(title__icontains=keyword)) & Q(category__icontains=cat))
+
+        elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
 
         for item in object_list:
             item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
             
-        return object_list
+        if km!='all':
+            for item in object_list:
+                if item.tempLocation<float(km):
+                    my_list.append(item)
+            return my_list
+        else:
+            return object_list
 
 class UserListView(ListView):
     model = User
