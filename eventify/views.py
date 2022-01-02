@@ -1,3 +1,4 @@
+import django
 from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
 from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent
@@ -18,6 +19,7 @@ from django.views.generic import (
 )
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
+from datetime import date
 
 class PostListView(LoginRequiredMixin,ListView):
     model = Post
@@ -26,6 +28,7 @@ class PostListView(LoginRequiredMixin,ListView):
     paginate_by = 5
 
     def get_queryset(self):
+        my_list = []
         try:
             keyword = self.request.GET['q']
             cat = self.request.GET['cat']
@@ -129,10 +132,13 @@ class PostDetailView(LoginRequiredMixin,DetailView):
         pk=self.kwargs['pk']
         context = super().get_context_data(**kwargs)
         event=Post.objects.get(id=pk)
+        if event.eventdate < date.today():
+            event.isLate=True
         location = geolocator.reverse(event.location)
         context['registerevent'] = RegisterEvent.objects.filter(post_id=pk,approved_register=True)
         context['unRegister'] = RegisterEvent.objects.filter(post_id=pk,author_id=self.request.user.id,approved_register=True)
         context['address']=location.address
+        context['isLate']=event.isLate
         return context
 
 
@@ -144,12 +150,16 @@ class ServiceDetailView(LoginRequiredMixin,DetailView):
         pk=self.kwargs['pk']
         geolocator = Nominatim(user_agent="arcan")
         service=Service.objects.get(id=pk)
+        if service.eventdate < date.today():
+            service.isLate=True
+
         location = geolocator.reverse(service.location)
         context = super().get_context_data(**kwargs)
         context['registerservice'] = RegisterService.objects.filter(service_id=pk,approved_register=True)
         context['unRegister'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=False)
         context['approved'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=True)
         context['address']=location.address
+        context['isLate']=service.isLate
         return context
 
 

@@ -51,10 +51,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'location_field.apps.DefaultConfig'
+    'location_field.apps.DefaultConfig',
+    'star_ratings',
+    
 
   
 ]
+STAR_RATINGS_CLEARABLE = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

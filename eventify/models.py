@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.fields import BooleanField
 from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
@@ -40,6 +41,7 @@ class Post(models.Model):
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
+    isLate=BooleanField(default=False)
    
 
     class Meta:
@@ -68,6 +70,8 @@ class Service(models.Model):
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
+    isLate=BooleanField(default=False)
+ 
 
     class Meta:
         ordering = ('-date_posted', )

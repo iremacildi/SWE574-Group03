@@ -36,6 +36,7 @@ urlpatterns = [
         template_name='users/password_change.html'), name='password_change'),
     path('password-change/done/', auth_views.PasswordChangeDoneView.as_view(
         template_name='users/password_change_done.html'), name='password_change_done'),
+    path('ratings/', include('star_ratings.urls', namespace='ratings')),    
 ]
 
 if settings.DEBUG:
