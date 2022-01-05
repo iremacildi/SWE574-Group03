@@ -10,6 +10,7 @@ class Profile(models.Model):
     location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
     address=models.TextField(blank=True)
     credits=models.IntegerField(default=6)
+    reserved=models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.user.username} Profile'

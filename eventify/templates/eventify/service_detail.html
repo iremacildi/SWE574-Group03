@@ -152,6 +152,33 @@
     {% endfor %}
     </div>
     {% endif %}
+
+    {% if user.is_authenticated  %}
+    <form method="POST" action="{% url 'approved' object.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="hidden" name="user_id" value="{{user.id}}">
+        </div>
+        {% if object.isGiven is True and object.author == user and isLate is True %}
+        <button style="background-color: brown;" class="btn btn-primary" type="submit">Cancel Comfirmation</button>
+        {% elif object.isGiven is False and object.author == user and isLate is True %}
+        <button class="btn btn-primary" type="submit">Comfirm you give the service</button>
+        {% else %}
+        {% with isBreak=False %}
+        {% for register in registerservice %}
+        {% if user.username == register.username and isLate is True %}
+        {% with isBreak=True %}
+        {% if isBreak == True  %}
+        <button class="btn btn-primary" type="submit">Comfirm you take the service</button>
+        {% endif %}
+        
+        {% endwith %}
+        {% endif %}
+        {% endfor %}
+        {% endwith %}
+        {% endif %}
+    </form>
+    {% endif %}
     <!-- Comment Form -->
     {% if user.is_authenticated %}
     <div class="card my-4">

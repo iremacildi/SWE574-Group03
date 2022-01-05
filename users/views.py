@@ -91,40 +91,16 @@ def approve_service_register(request):
         user = request.POST.get('author')
         item = request.POST.get('item_id')
         answer = request.POST.get('answer')
-        registerentity=RegisterService.objects.get(id=item)
-        service=Service.objects.get(id=registerentity.service_id)
         accept_delete=request.POST.get('type')
         if accept_delete=='Delete':
             RegisterService.objects.filter(author=user,id=item).delete()
             messages.success(request, "Successfully cancelled")
         else:    
             register=RegisterService.objects.get(author=user,id=item)
-
-            profil=Profile.objects.get(id=registerentity.author_id)
-            ownerProfile=Profile.objects.get(id=service.author_id)
-            if service.paid==False:
-                credits=profil.credits-service.duration
-                if credits>=0:
-                    ownerProfile.credits+=service.duration
-                    ownerProfile.save()
-                    profil.credits-=service.duration
-                    profil.save()
-                    service.paid=True
-                    service.save()
-                    register.approved_register=answer
-                    register.save()
-                    messages.success(request, "Successfully accepted")
-                else:
-                    RegisterService.objects.filter(author=user,id=item).delete()
-                    messages.warning(request, "User has not enough credits")  
-                    return redirect('profile')  
-            else:
-                profil.credits-=service.duration
-                profil.save()
-                register.approved_register=answer
-                register.save()                
-                messages.success(request, "Successfully accepted")
-                return redirect('profile')
+            register.approved_register=answer
+            register.save()   
+            messages.success(request, "Successfully accepted")
+            return redirect('profile')
     else:
         return redirect('profile')
     return redirect('profile')

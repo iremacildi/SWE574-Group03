@@ -1,7 +1,7 @@
 import django
 from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
-from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent
+from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent,Approved
 from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -262,6 +262,69 @@ def add_comment(request, pk):
     return redirect('post_detail', pk=pk)
 
 @login_required
+def approved(request, pk):
+    app=None
+    count=None
+    service = get_object_or_404(Service, pk=pk)
+    user = User.objects.get(id=request.POST.get('user_id'))
+    if request.method == 'POST' and service.author_id==user.id:
+        if service.author_id==user.id and service.isGiven==False:
+            service.isGiven=True
+            service.save()
+            appr=Approved.objects.filter(service_id=service.id,isOk=False)
+            if appr.exists():
+                for item in appr:
+                    senderUser=User.objects.get(id=item.author_id)
+                    xowner=User.objects.get(id=service.author_id)
+                    if item.isOk==False:
+                        senderUser.profile.reserved-=service.duration
+                        senderUser.save()
+                        item.isOk=True
+                        item.save()
+                        if service.paid==False:
+                            xowner.profile.credits+=service.duration
+                            service.paid=True
+                            service.save()
+                            xowner.save()
+
+
+            messages.success(request, "Successfully comfirmed")
+        else:
+            service.isGiven=False
+            service.save()
+            messages.success(request, "Successfully Cancelled")
+
+
+    elif  request.method == 'POST':
+
+        try:
+            app=Approved.objects.get(author_id=user.id,service_id=service.id)
+            count=1
+        except:
+            app=Approved(author=user, service=service).save()
+            approved(request, pk)
+
+        if app and app.isOk==False and service.isGiven==True:
+            user.profile.reserved-=service.duration
+            user.save()
+            app.isOk=True
+            app.save()
+            owner=User.objects.get(id=service.author_id)
+            if service.paid==False:
+                 owner.profile.credits+=service.duration
+                 owner.save()
+                 service.paid=True
+                 service.save()
+                 return redirect('service_detail', pk=pk)  
+
+    else:    
+        messages.warning(request, "You already comfirmed") 
+        return redirect('service_detail', pk=pk)
+    if count==1:
+         messages.warning(request, "You already comfirmed")   
+    return redirect('service_detail', pk=pk)
+
+@login_required
 def add_servicecomment(request, pk):
     service = get_object_or_404(Service, pk=pk)
     if request.method == 'POST':
@@ -334,6 +397,9 @@ def register_service(request, pk):
                 return redirect('service_detail', pk=pk)
             else:
                 RegisterService(author=user, service=service,title=service.title,owner=service.author.id, username=user.username).save()
+                user.profile.credits-=service.duration
+                user.profile.reserved+=service.duration
+                user.save()
                 messages.success(request, "Registration request sent successfully")
                 return redirect('service_detail', pk=pk) 
        
@@ -347,6 +413,10 @@ def unregister_service(request, pk):
         ids=request.POST.get('user_id')
         service_id=request.POST.get('service_id')
         RegisterService.objects.filter(author_id=ids,service_id=service_id).delete()
+        user=User.objects.get(id=ids)
+        user.profile.credits+=service.duration
+        user.profile.reserved-=service.duration
+        user.save()
         messages.success(request, "Successfully cancelled application")    
         return redirect('service_detail', pk=pk)
     else:

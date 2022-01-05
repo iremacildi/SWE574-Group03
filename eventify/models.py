@@ -71,6 +71,7 @@ class Service(models.Model):
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
     isLate=BooleanField(default=False)
+    isGiven=BooleanField(default=False)
  
 
     class Meta:
@@ -99,6 +100,18 @@ class ServiceComment(models.Model):
     def __str__(self):
         return self.author
 
+class Approved(models.Model):
+    service = models.ForeignKey(Service, related_name='approved', on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    isOk = models.BooleanField(default=False)
+    created_date = models.DateTimeField(default=timezone.now)
+
+
+    def get_absolute_url(self):
+        return reverse("service_list")
+
+    def __str__(self):
+        return self.author
 
 class RegisterEvent(models.Model):
     post = models.ForeignKey(Post, related_name='postregister', on_delete=models.CASCADE)
