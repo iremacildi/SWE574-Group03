@@ -19,6 +19,7 @@ from .views import (
     register_service,
     unregister_service,
     unregister_event,
+    approved
 )
 
 
@@ -42,4 +43,5 @@ urlpatterns = [
     path('service/<int:pk>/serviceregister/', register_service, name='register_service'),
     path('service/<int:pk>/unserviceregister/', unregister_service, name='unregister_service'),
     path('service/<int:pk>/servicecomment/', add_servicecomment, name='add_servicecomment'),
+     path('service/<int:pk>/approved/', approved, name='approved'),
 ]
