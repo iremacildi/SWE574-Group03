@@ -20,6 +20,8 @@ from django.views.generic import (
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
 from datetime import date
+from actstream.actions import follow, unfollow
+from actstream.models import user_stream
 
 class PostListView(ListView):
     model = Post
@@ -370,6 +372,17 @@ def unregister_event(request, pk):
     else:
         return redirect('post_detail', pk=pk)
 
+@login_required
+def follow_unfollow_user(request, username):
+    other_user = get_object_or_404(User, username=username)
+    if request.method == 'POST': 
+        if 'unfollow' in request.POST:
+            unfollow(request.user, other_user)
+        elif 'follow' in request.POST:
+            follow(request.user, other_user, actor_only=False)
+        return redirect('profiledetail', username=username)
+    else:
+        return redirect('profiledetail', username=username)
 
 @login_required
 def register_service(request, pk):

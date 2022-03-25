@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from .views import (
     PostListView,
@@ -16,6 +16,7 @@ from .views import (
     add_comment,
     add_servicecomment,
     register_event,
+    follow_user,
     register_service,
     unregister_service,
     unregister_event,
@@ -41,7 +42,8 @@ urlpatterns = [
     path('post/<int:pk>/postregister/', register_event, name='register_event'),
     path('post/<int:pk>/unpostregister/', unregister_event, name='unregister_event'),
     path('service/<int:pk>/serviceregister/', register_service, name='register_service'),
+    path('user/<str:username>/followuser/', follow_user, name='follow_user'),
     path('service/<int:pk>/unserviceregister/', unregister_service, name='unregister_service'),
     path('service/<int:pk>/servicecomment/', add_servicecomment, name='add_servicecomment'),
-     path('service/<int:pk>/approved/', approved, name='approved'),
+    path('service/<int:pk>/approved/', approved, name='approved'),
 ]
