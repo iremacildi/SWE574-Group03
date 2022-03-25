@@ -12,6 +12,7 @@ from .views import (
     ServiceCreateView,
     ServiceUpdateView,
     ServiceDeleteView,
+    FeedView,
     # UserServiceListView,
     add_comment,
     add_servicecomment,
@@ -27,6 +28,7 @@ from .views import (
 urlpatterns = [
     path('', PostListView.as_view(), name='index'),
     path('services', ServiceListView.as_view(), name='services'),
+    path('feed', FeedView.as_view(), name='feed'),
     path('user/<str:username>/', UserListView.as_view(), name='profiledetail'),
     # path('user/<str:username>/', UserServiceListView.as_view(), name='user_services'),
     path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
@@ -46,4 +48,5 @@ urlpatterns = [
     path('service/<int:pk>/unserviceregister/', unregister_service, name='unregister_service'),
     path('service/<int:pk>/servicecomment/', add_servicecomment, name='add_servicecomment'),
     path('service/<int:pk>/approved/', approved, name='approved'),
+    path('^activity/', include('actstream.urls')),
 ]

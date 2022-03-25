@@ -20,8 +20,8 @@ from django.views.generic import (
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
 from datetime import date
-from actstream.actions import follow, unfollow
-from actstream.models import user_stream
+from actstream.actions import follow, unfollow, action
+from actstream.models import user_stream, Action
 
 class PostListView(ListView):
     model = Post
@@ -67,6 +67,19 @@ class PostListView(ListView):
             return my_list
         else:
             return object_list
+
+class FeedView(ListView):
+    model = Action
+    template_name = 'eventify/feed.html'
+    context_object_name = 'stream'
+    paginate_by = 10
+
+    def get_queryset(self):
+        stream = user_stream(self.request.user, with_user_activity=False)
+        my_list = []
+        for stream_item in stream:
+            my_list.append(stream_item)
+        return my_list
 
 class ServiceListView(ListView):
     model = Service
@@ -354,6 +367,7 @@ def register_event(request, pk):
         except:
             pass
         RegisterEvent(author=user, post=post,title=post.title,username=user.username).save()
+        action.send(request.user, verb="registered event", target=event)
         messages.success(request, "You register event successfully")
         return redirect('post_detail', pk=pk) 
        
@@ -413,6 +427,7 @@ def register_service(request, pk):
                 user.profile.credits-=service.duration
                 user.profile.reserved+=service.duration
                 user.save()
+                action.send(request.user, verb="registered service", target=service)
                 messages.success(request, "Registration request sent successfully")
                 return redirect('service_detail', pk=pk) 
        
