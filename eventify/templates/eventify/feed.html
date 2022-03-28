@@ -1,0 +1,10 @@
+{% extends "eventify/base.html" %}
+{% load activity_tags %}
+{% block content %}
+    <h1>Feed Page</h1>
+        {% activity_stream 'user' user %}
+        {% for action in stream %}
+            <p>{% display_action action %}</p>
+        {% endfor %}
+{% endblock content %}
+

@@ -53,8 +53,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'location_field.apps.DefaultConfig',
     'star_ratings',
-    
-
+    'django.contrib.sites',
+    'actstream', 
+    'django_jsonfield_backport'
   
 ]
 STAR_RATINGS_CLEARABLE = True
@@ -181,3 +182,13 @@ LOGIN_URL = 'login'
 # Email Settings
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+SITE_ID = 1
+
+ACTSTREAM_SETTINGS = {
+    'MANAGER': 'web.managers.MyActionManager',
+    'FETCH_RELATIONS': True,
+    'USE_PREFETCH': True,
+    'USE_JSONFIELD': False,
+    'GFK_FETCH_DEPTH': 1,
+}

@@ -22,6 +22,9 @@ from django.views.generic import (
 )
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
+from datetime import date
+from actstream.actions import follow, unfollow, action
+from actstream.models import user_stream, Action
 from datetime import date, timezone
 from datetime import timedelta
 
@@ -69,6 +72,19 @@ class PostListView(ListView):
             return my_list
         else:
             return object_list
+
+class FeedView(ListView):
+    model = Action
+    template_name = 'eventify/feed.html'
+    context_object_name = 'stream'
+    paginate_by = 10
+
+    def get_queryset(self):
+        stream = user_stream(self.request.user, with_user_activity=False)
+        my_list = []
+        for stream_item in stream:
+            my_list.append(stream_item)
+        return my_list
 
 class ServiceListView(ListView):
     model = Service
@@ -358,6 +374,7 @@ def register_event(request, pk):
         except:
             pass
         RegisterEvent(author=user, post=post,title=post.title,username=user.username).save()
+        action.send(request.user, verb="registered event", target=event)
         messages.success(request, "You register event successfully")
         return redirect('post_detail', pk=pk) 
        
@@ -376,6 +393,17 @@ def unregister_event(request, pk):
     else:
         return redirect('post_detail', pk=pk)
 
+@login_required
+def follow_unfollow_user(request, username):
+    other_user = get_object_or_404(User, username=username)
+    if request.method == 'POST': 
+        if 'unfollow' in request.POST:
+            unfollow(request.user, other_user)
+        elif 'follow' in request.POST:
+            follow(request.user, other_user, actor_only=False)
+        return redirect('profiledetail', username=username)
+    else:
+        return redirect('profiledetail', username=username)
 
 @login_required
 def register_service(request, pk):
@@ -406,6 +434,7 @@ def register_service(request, pk):
                 user.profile.credits-=service.duration
                 user.profile.reserved+=service.duration
                 user.save()
+                action.send(request.user, verb="registered service", target=service)
                 messages.success(request, "Registration request sent successfully")
                 return redirect('service_detail', pk=pk) 
        
