@@ -69,7 +69,7 @@
         <h1 class="mt-4">Title: {{object.title}}</h1>
         <p>
             Posted on {{ object.date_posted|date:"F d, Y" }}
-            {% if object.author == user %}
+            {% if object.author == user and isLate is  False %}
             <a class="btn btn-info btn-sm mt-1 mb-1 float-right" href="{% url 'post_update' object.id %}">Update</a>
             <a class="btn btn-danger btn-sm mt-1 mb-1 float-right mr-2 "
                 href="{% url 'post_delete' object.id %}">Delete</a>
