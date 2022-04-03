@@ -1,3 +1,4 @@
+from pyexpat import model
 import django
 from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
@@ -75,7 +76,7 @@ class FeedView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        stream = user_stream(self.request.user, with_user_activity=False)
+        stream = user_stream(self.request.user)
         my_list = []
         for stream_item in stream:
             my_list.append(stream_item)
@@ -192,6 +193,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        action.send(self.request.user, verb="created event")
         return super().form_valid(form)
 
 class ServiceCreateView(LoginRequiredMixin, CreateView):
@@ -200,6 +202,7 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        action.send(self.request.user, verb="created service")
         return super().form_valid(form)
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -212,6 +215,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        action.send(self.request.user, verb="updated event")
         return super().form_valid(form)
 
     def test_func(self):
@@ -230,6 +234,7 @@ class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        action.send(self.request.user, verb="updated service")
         return super().form_valid(form)
 
     def test_func(self):
@@ -380,7 +385,9 @@ def unregister_event(request, pk):
     if request.method == 'POST':
         ids=request.POST.get('user_id')
         post_id=request.POST.get('post_id')
-        RegisterEvent.objects.filter(author_id=ids,post_id=post_id).delete()
+        event = RegisterEvent.objects.filter(author_id=ids,post_id=post_id)
+        event.delete()
+        action.send(request.user, verb="unregistered event", target=event)
         messages.success(request, "Successfully cancelled application")    
         return redirect('post_detail', pk=pk)
     else:
@@ -427,7 +434,7 @@ def register_service(request, pk):
                 user.profile.credits-=service.duration
                 user.profile.reserved+=service.duration
                 user.save()
-                action.send(request.user, verb="registered service", target=service)
+                action.send(request.user, verb="sent registration request", target=service)
                 messages.success(request, "Registration request sent successfully")
                 return redirect('service_detail', pk=pk) 
        
@@ -445,6 +452,7 @@ def unregister_service(request, pk):
         user.profile.credits+=service.duration
         user.profile.reserved-=service.duration
         user.save()
+        action.send(request.user, verb="unregistered", target=service)
         messages.success(request, "Successfully cancelled application")    
         return redirect('service_detail', pk=pk)
     else:
