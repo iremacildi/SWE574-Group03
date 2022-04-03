@@ -48,5 +48,5 @@ urlpatterns = [
     path('service/<int:pk>/unserviceregister/', unregister_service, name='unregister_service'),
     path('service/<int:pk>/servicecomment/', add_servicecomment, name='add_servicecomment'),
     path('service/<int:pk>/approved/', approved, name='approved'),
-    path('^activity/', include('actstream.urls')),
+    path('activity/', include('actstream.urls')),
 ]

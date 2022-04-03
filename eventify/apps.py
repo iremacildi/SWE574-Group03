@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 class EventifyConfig(AppConfig):
     name = 'eventify'
@@ -7,4 +8,4 @@ class EventifyConfig(AppConfig):
     def ready(self):
         import users.signals
         from actstream import registry
-        registry.register(settings.AUTH_USER_MODEL, self.get_model('Post'), self.get_model('Service'))
+        registry.register(get_user_model(), self.get_model('Post'), self.get_model('Service'))

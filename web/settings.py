@@ -189,6 +189,6 @@ ACTSTREAM_SETTINGS = {
     'MANAGER': 'web.managers.MyActionManager',
     'FETCH_RELATIONS': True,
     'USE_PREFETCH': True,
-    'USE_JSONFIELD': False,
+    'USE_JSONFIELD': True,
     'GFK_FETCH_DEPTH': 1,
 }
