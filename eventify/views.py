@@ -23,6 +23,8 @@ from geopy.geocoders import Nominatim
 from datetime import date
 from actstream.actions import follow, unfollow, action
 from actstream.models import user_stream, Action
+from datetime import date, timezone
+from datetime import timedelta
 
 class PostListView(ListView):
     model = Post
@@ -175,6 +177,8 @@ class ServiceDetailView(LoginRequiredMixin,DetailView):
         geolocator = Nominatim(user_agent="arcan")
         service=Service.objects.get(id=pk)
         if service.eventdate < date.today():
+           service.isLate=True
+        elif service.eventdate == date.today() and service.eventtime < (datetime.datetime.now()+datetime.timedelta(hours=4)).time():
             service.isLate=True
 
         location = geolocator.reverse(service.location)
