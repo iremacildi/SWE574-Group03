@@ -2,6 +2,8 @@ from pyexpat import model
 import django
 from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
+
+from eventify.ViewExtentions import OverRideDeleteView
 from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent,Approved
 from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
@@ -124,9 +126,9 @@ class ServiceListView(ListView):
             for item in object_list:
                 if item.tempLocation<float(km):
                     my_list.append(item)
-            return my_list
+            return my_list.filter(IsCancelled=False)
         else:
-            return object_list
+            return object_list.filter(IsCancelled=False)
 
 class UserListView(ListView):
     model = User
@@ -264,7 +266,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 def about(request):
     return render(request, 'eventify/about.html', {'title': 'About'})
 
-class ServiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class ServiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, OverRideDeleteView):
     model = Service
     success_url = '/'
 
