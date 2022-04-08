@@ -197,7 +197,8 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        action.send(self.request.user, verb="created event")
+        event = form.save()
+        action.send(self.request.user, verb="created event", target=event)
         return super().form_valid(form)
 
 class ServiceCreateView(LoginRequiredMixin, CreateView):
@@ -206,7 +207,8 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        action.send(self.request.user, verb="created service")
+        service = form.save()
+        action.send(self.request.user, verb="created service", target=service)
         return super().form_valid(form)
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -219,7 +221,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        action.send(self.request.user, verb="updated event")
+        action.send(self.request.user, verb="updated event", target=form.instance)
         return super().form_valid(form)
 
     def test_func(self):
@@ -238,7 +240,7 @@ class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        action.send(self.request.user, verb="updated service")
+        action.send(self.request.user, verb="updated service", target=form.instance)
         return super().form_valid(form)
 
     def test_func(self):
