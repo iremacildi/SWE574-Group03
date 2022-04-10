@@ -41,6 +41,7 @@ class Post(models.Model):
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
+    IsCancelled= models.BooleanField(default=False)
     isLate=BooleanField(default=False)
    
 
@@ -72,6 +73,7 @@ class Service(models.Model):
     paid= models.BooleanField(default=False)
     isLate=BooleanField(default=False)
     isGiven=BooleanField(default=False)
+    IsCancelled= models.BooleanField(default=False)
  
 
     class Meta:
