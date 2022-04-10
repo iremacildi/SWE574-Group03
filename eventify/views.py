@@ -2,6 +2,8 @@ from pyexpat import model
 import django
 from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
+
+import users
 from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent,Approved
 from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
@@ -22,7 +24,7 @@ from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
 from datetime import date
 from actstream.actions import follow, unfollow, action
-from actstream.models import user_stream, Action
+from actstream.models import user_stream, Action, following, followers
 from datetime import date, timezone
 from datetime import timedelta
 
@@ -312,7 +314,7 @@ def approved(request, pk):
                             xowner.save()
 
 
-            messages.success(request, "Successfully comfirmed")
+            messages.success(request, "Successfully confirmed")
         else:
             service.isGiven=False
             service.save()
@@ -342,10 +344,10 @@ def approved(request, pk):
                  return redirect('service_detail', pk=pk)  
 
     else:    
-        messages.warning(request, "You already comfirmed") 
+        messages.warning(request, "You already confirmed") 
         return redirect('service_detail', pk=pk)
     if count==1:
-         messages.warning(request, "You already comfirmed")   
+         messages.warning(request, "You already confirmed")   
     return redirect('service_detail', pk=pk)
 
 @login_required
@@ -471,3 +473,73 @@ def unregister_service(request, pk):
 #         return redirect('service_detail', pk=pk)
 #     else:
 #         return redirect('service_detail', pk=pk)     
+
+
+# @login_required
+# def follower_list_view(request, username):
+#     followers_list = followers(request.user)
+#     print(followers_list)
+    
+#     return redirect('followers_list', username=username)
+
+# @login_required
+# def following_list_view(request, username):
+#     following_list = following(request.user)
+#     print(following_list)
+    
+#     return redirect('following_list', username=username)
+
+
+
+
+class FollowersView(ListView):
+    model = Action
+    template_name = 'users/followers_list.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        username=self.kwargs.get('username')
+        if(username == ''):
+            followers_var = followers(self.request.user)
+        else:
+            followers_var = followers(User.objects.get(username=username))
+
+        followers_var = followers(User.objects.get(username=username))
+        followers_list = []
+        for stream_item in followers_var:
+            followers_list.append(stream_item)
+        context = {
+            'username': username,
+            'followers_list' : followers_list
+
+        }
+       
+        return context
+
+
+class FollowingView(ListView):
+    model = Action
+    template_name = 'users/following_list.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        username=self.kwargs.get('username')
+        if(username == ''):
+            following_var = following(self.request.user)
+        else:
+            following_var = following(User.objects.get(username=username))
+
+        following_list = []
+        for stream_item in following_var:
+            following_list.append(stream_item)
+        context = {
+            'username': username,
+            'following_list' : following_list
+
+        }
+       
+        return context
+
+

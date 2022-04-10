@@ -8,6 +8,9 @@ static-cdn
 bin/
 include/
 pip-selfcheck.json
+.myvenv
+myvenv/
+.env/
 
 # Django related 
 # src/<yourproject>/settings/local.py
