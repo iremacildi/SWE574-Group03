@@ -9,6 +9,10 @@
             <p class="text-secondary">Username: {{ object.username }}</p>
             <p class="text-secondary">Email: {{object.email }}</p>
             <p class="text-secondary">Credits: {{object.profile.credits }}</p>
+            <a href="{% url 'followers_list' object.username %}"> Followers</a>
+            <a href="{% url 'following_list' object.username %}"> Following</a>
+
+            
             <form method="POST" action="{% url 'follow_unfollow_user' object.username %}">
                 {% csrf_token %}
                 <div class="form-group">

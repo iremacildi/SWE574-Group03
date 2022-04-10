@@ -109,7 +109,8 @@ DATABASES = {
         'ENGINE': env('DB_ENGINE', default = 'django.db.backends.postgresql_psycopg2'),
         'NAME': env('DB_NAME', default='eventifydb'), 
         'USER': env('DB_USER', default='postgres'), 
-        'PASSWORD': env('DB_PASSWORD', default='Pass1234'),
+        # 'PASSWORD': env('DB_PASSWORD', default='Pass1234'),
+        'PASSWORD': env('DB_PASSWORD', default='q1w2e3'),
         'HOST': env('DB_HOST', default='127.0.0.1'), 
         # 'HOST': env('DB_HOST'), 
         'PORT': env('DB_PORT', default='5432'),
@@ -153,7 +154,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

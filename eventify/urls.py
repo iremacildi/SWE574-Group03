@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
 from .views import (
+    FollowersView,
     PostListView,
     PostDetailView,
     PostCreateView,
@@ -13,9 +14,12 @@ from .views import (
     ServiceUpdateView,
     ServiceDeleteView,
     FeedView,
+    FollowersView,
     # UserServiceListView,
     add_comment,
     add_servicecomment,
+    # follower_list_view,
+    # following_list_view,
     register_event,
     follow_unfollow_user,
     register_service,
@@ -30,6 +34,7 @@ urlpatterns = [
     path('services', ServiceListView.as_view(), name='services'),
     path('feed', FeedView.as_view(), name='feed'),
     path('user/<str:username>/', UserListView.as_view(), name='profiledetail'),
+
     # path('user/<str:username>/', UserServiceListView.as_view(), name='user_services'),
     path('post/<int:pk>/', PostDetailView.as_view(), name='post_detail'),
     path('service/<int:pk>/', ServiceDetailView.as_view(), name='service_detail'),
@@ -49,4 +54,8 @@ urlpatterns = [
     path('service/<int:pk>/servicecomment/', add_servicecomment, name='add_servicecomment'),
     path('service/<int:pk>/approved/', approved, name='approved'),
     path('activity/', include('actstream.urls')),
+
+
+
+
 ]
