@@ -44,7 +44,7 @@
         </form>
         {% endif %}
 
-        {% if approved|length is 0  and unRegister|length is 0 %}  
+        {% if approved|length is 0  and unRegister|length is 0 and object.IsCancelled is False %}  
         <form method="POST" action="{% url 'register_service' object.id %}">
             {% csrf_token %}
             <div class="form-group">
@@ -67,10 +67,15 @@
         
         
         {% else %}
+        {% if object.IsCancelled %}
         <div class="alert alert-warning">
+           Cancalled
+          </div>
+          {% else %}
+          <div class="alert alert-warning">
             Application deadline has passed!
           </div>
-
+          {% endif %}
           {% endif %}
           {% endif %}
       
@@ -82,15 +87,16 @@
         <h1 class="mt-4">{{object.title}}</h1>
         <p>
             Posted on {{ object.date_posted|date:"F d, Y" }}
-            {% if object.author == user and isLate is  False %}
+            {% if object.author == user and isLate is  False and object.IsCancelled is False%}
             <a class="btn btn-info btn-sm mt-1 mb-1 float-right" href="{% url 'service_update' object.id %}">Update</a>
             {% if object.IsCancelled is False %}
             <a class="btn btn-danger btn-sm mt-1 mb-1 float-right mr-2 "
                 href="{% url 'service_delete' object.id %}">Cancel</a>
+                 {% endif %}
             {%else%}
             <a class="btn btn-danger btn-sm mt-1 mb-1 float-right mr-2 "
             href="#">Cancelled</a>
-            {% endif %}
+           
             {% endif %}
         </p>
     </div>
@@ -173,7 +179,7 @@
         {% for register in registerservice %}
         {% if user.username == register.username and isLate is True %}
         {% with isBreak=True %}
-        {% if isBreak == True  %}
+        {% if isBreak == True %}
         <button class="btn btn-primary" type="submit">Comfirm you take the service</button>
         {% endif %}
         
