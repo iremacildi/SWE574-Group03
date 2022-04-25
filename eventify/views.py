@@ -1,9 +1,11 @@
+import datetime
 from pyexpat import model
 import django
 from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
 
 import users
+from eventify.ViewExtentions import OverRideDeleteView
 from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent,Approved
 from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
@@ -126,9 +128,9 @@ class ServiceListView(ListView):
             for item in object_list:
                 if item.tempLocation<float(km):
                     my_list.append(item)
-            return my_list
+            return my_list.filter(IsCancelled=False)
         else:
-            return object_list
+            return object_list.filter(IsCancelled=False)
 
 class UserListView(ListView):
     model = User
@@ -199,7 +201,8 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        action.send(self.request.user, verb="created event")
+        event = form.save()
+        action.send(self.request.user, verb="created event", target=event)
         return super().form_valid(form)
 
 class ServiceCreateView(LoginRequiredMixin, CreateView):
@@ -208,7 +211,8 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        action.send(self.request.user, verb="created service")
+        service = form.save()
+        action.send(self.request.user, verb="created service", target=service)
         return super().form_valid(form)
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -221,7 +225,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        action.send(self.request.user, verb="updated event")
+        action.send(self.request.user, verb="updated event", target=form.instance)
         return super().form_valid(form)
 
     def test_func(self):
@@ -240,7 +244,7 @@ class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        action.send(self.request.user, verb="updated service")
+        action.send(self.request.user, verb="updated service", target=form.instance)
         return super().form_valid(form)
 
     def test_func(self):
@@ -264,7 +268,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 def about(request):
     return render(request, 'eventify/about.html', {'title': 'About'})
 
-class ServiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class ServiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, OverRideDeleteView):
     model = Service
     success_url = '/'
 
