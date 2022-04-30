@@ -61,6 +61,6 @@ jobs:
         application_name: eventify
         environment_name: Eventify-env
         
-        version_label: 1
+        version_label: Sample Application
         region: "us-east-1"
         deployment_package: deploy.zip
