@@ -25,10 +25,10 @@ jobs:
         
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.9.7
+    - name: Set up Python 3.8
       uses: actions/setup-python@v3
       with:
-        python-version: 3.9.7
+        python-version: 3.8
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
@@ -61,6 +61,6 @@ jobs:
         application_name: eventify
         environment_name: Eventify-env
         
-        version_label: ${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
+        version_label: 1
         region: "us-east-1"
         deployment_package: deploy.zip
