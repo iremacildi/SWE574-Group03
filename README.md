@@ -20,5 +20,10 @@ Code can be reached from development branch.
 > pip install -r requirements.txt
 ## Apply Migrations
 > python manage.py migrate
+## Apply Actstream Migration
+> set USE_JSONFIELD setting as False  
+> run python manage.py migrate actstream 0001  
+> set USE_JSONFIELD setting as True  
+> run python manage.py migrate actstream
 ## Run server
 > python manage.py runserver
