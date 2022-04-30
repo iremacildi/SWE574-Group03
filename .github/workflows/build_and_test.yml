@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
         
@@ -39,3 +39,28 @@ jobs:
     - name: Run Tests
       run: |
         python manage.py test
+        
+  deploy:
+    needs: [test]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v2
+
+    - name: Generate deployment package
+      run: zip -r deploy.zip . -x '*.git*'
+
+    - name: Deploy to EB
+      uses: einaregilsson/beanstalk-deploy@v20
+      with:
+      
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        
+        application_name: eventify
+        environment_name: Eventify-env
+        
+        version_label: ${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
+        region: "us-east-1"
+        deployment_package: deploy.zip
