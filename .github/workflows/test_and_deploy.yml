@@ -4,7 +4,7 @@ env:
   APP_NAME: eventify
   S3_BUCKET: elasticbeanstalk-us-east-1-407376927836
   AWS_REGION: us-east-1
-  AWS_PLATFORM: "Python 3.8"
+  AWS_PLATFORM: Python
   PIPELINE_ID: ${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
 
 on:
