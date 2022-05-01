@@ -75,16 +75,11 @@ jobs:
     needs: [create_eb_version]
     runs-on: ubuntu-latest
     steps:
-      - name: Create SSH key
+      - name: Create SSH key file
         run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_PRIVATE_KEY" > ../eventify-key-pair.pem
-          sudo chmod 600 ../eventify-key-pair.pem
+          mkdir -p $HOME/.ssh/
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/eventify-key-pair.pem
         shell: bash
-        env:
-          SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
-          SSH_KNOWN_HOSTS: ${{secrets.SSH_KNOWN_HOSTS}}
-          SSH_KEY_PATH: ${{ github.workspace }}/../private.key
       - uses: actions/checkout@v2
       - name: Set up Python 3.8 (needed for eb cli)
         uses: actions/setup-python@v1
