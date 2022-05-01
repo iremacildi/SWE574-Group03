@@ -26,3 +26,6 @@ django-activity-stream==1.4.0
 cryptography==36.0.0
 cffi==1.15.0
 
+elasticsearch-dsl==7.0.0
+django-elasticsearch-dsl > 0.5.1
+django-elasticsearch-dsl-drf > 0.17.6

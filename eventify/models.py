@@ -55,8 +55,7 @@ class Post(models.Model):
         return reverse('post_detail', kwargs={'pk': self.pk})
 
 class Service(models.Model):
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     eventdate = models.DateField(default=timezone.now)
     tempLocation = models.TextField(blank=True)

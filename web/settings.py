@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'star_ratings',
     'django.contrib.sites',
     'actstream', 
-    'django_jsonfield_backport'
+    'django_jsonfield_backport',
+    'django_elasticsearch_dsl',
   
 ]
 STAR_RATINGS_CLEARABLE = True
@@ -192,4 +193,13 @@ ACTSTREAM_SETTINGS = {
     'USE_PREFETCH': True,
     'USE_JSONFIELD': True,
     'GFK_FETCH_DEPTH': 1,
+}
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'localhost:9200',
+        'verify_certs': False,
+        'ca_certs': None,
+
+    },
 }

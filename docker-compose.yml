@@ -14,7 +14,9 @@ services:
 
   #   depends_on:
   #     - web
-
+  elasticsearch:
+    container_name: core_search
+    image: blacktop/elasticsearch:6.7.1
            
   web:
    container_name: core_eventify
@@ -27,6 +29,7 @@ services:
      - static_volume:/web/static
    depends_on:
      - db 
+     - elasticsearch
 
    ports:
      - 80:8000
