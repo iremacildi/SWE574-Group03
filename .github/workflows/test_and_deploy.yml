@@ -1,0 +1,104 @@
+name: Eventify Pipeline
+
+env:
+  APP_NAME: eventify
+  APP_ENV: Eventify-env
+  S3_BUCKET: elasticbeanstalk-us-east-1-407376927836
+  AWS_REGION: us-east-1
+  AWS_PLATFORM: Python
+  PIPELINE_ID: ${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+        
+    services:
+      postgres:
+        image: postgres:14.1
+        env:
+          POSTGRES_DB: github_actions
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+          # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest-django
+    - name: Run migrations
+      run: python manage.py migrate
+    - name: Run Tests
+      run: |
+        python manage.py test
+        
+  create_eb_version:
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS credentials 
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - run: |
+          AWS_VERSION_LABEL=${{env.APP_NAME}}-${{env.PIPELINE_ID}}
+
+          echo "Creating Source Bundle"
+          zip -r ${{env.APP_NAME}}.zip app.js Dockerfile dockerignore package.json
+          S3_KEY="$AWS_VERSION_LABEL.zip"
+
+          echo "Uploading Source Bundle to S3"
+          aws s3 cp ${{env.APP_NAME}}.zip s3://${{env.S3_BUCKET}}/${S3_KEY} --region ${{env.AWS_REGION}}
+
+          echo "Creating Elastic Beanstalk version"
+          aws elasticbeanstalk create-application-version --application-name ${{env.APP_NAME}} --version-label $AWS_VERSION_LABEL --region ${{env.AWS_REGION}} --source-bundle S3Bucket=${{env.S3_BUCKET}},S3Key=${S3_KEY} --auto-create-application
+
+  deploy_aws:
+    needs: [create_eb_version]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8 (needed for eb cli)
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.8"
+      - name: Configure AWS credentials 
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - run: |
+          AWS_VERSION_LABEL=${{env.APP_NAME}}-${{env.PIPELINE_ID}}
+
+          echo "Installing Elastic Beanstalk Cli"
+          python -m pip install --upgrade pip
+          pip install awsebcli --upgrade
+          eb --version
+
+          echo "Deploy init"
+          mkdir -p $HOME/.ssh
+          echo -e "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/eventify-key-pair.pem
+          chmod 777 $HOME/.ssh/eventify-key-pair.pem
+          eb init -i ${{env.APP_NAME}} -p ${{env.AWS_PLATFORM}} -k "eventify-key-pair" --region ${{env.AWS_REGION}}
+          eb deploy ${{env.APP_ENV}} --version ${AWS_VERSION_LABEL}
+          echo "Deploy finished"
