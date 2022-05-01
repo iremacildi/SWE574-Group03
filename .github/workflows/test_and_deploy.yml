@@ -79,6 +79,7 @@ jobs:
         run: |
           mkdir -p $HOME/.ssh/
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/eventify-key-pair.pem
+          sudo chmod 777 $HOME/.ssh/eventify-key-pair.pem
           cat $HOME/.ssh/eventify-key-pair.pem
         shell: bash
       - uses: actions/checkout@v2
