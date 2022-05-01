@@ -75,13 +75,6 @@ jobs:
     needs: [create_eb_version]
     runs-on: ubuntu-latest
     steps:
-      - name: Create SSH key file
-        run: |
-          mkdir -p $HOME/.ssh/
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/eventify-key-pair.pem
-          sudo chmod 777 $HOME/.ssh/eventify-key-pair.pem
-          cat $HOME/.ssh/eventify-key-pair.pem
-        shell: bash
       - uses: actions/checkout@v2
       - name: Set up Python 3.8 (needed for eb cli)
         uses: actions/setup-python@v1
@@ -102,6 +95,9 @@ jobs:
           eb --version
 
           echo "Deploy init"
+          mkdir -p $HOME/.ssh
+          echo -e "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/eventify-key-pair.pem
+          chmod 777 $HOME/.ssh/eventify-key-pair.pem
           eb init -i ${{env.APP_NAME}} -p ${{env.AWS_PLATFORM}} -k ${{secrets.AWS_ID}} --region ${{env.AWS_REGION}}
           eb deploy ${{env.APP_NAME}} --version ${AWS_VERSION_LABEL}
           echo "Deploy finished"
