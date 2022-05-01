@@ -2,6 +2,7 @@ name: Eventify Pipeline
 
 env:
   APP_NAME: eventify
+  APP_ENV: Eventify-env
   S3_BUCKET: elasticbeanstalk-us-east-1-407376927836
   AWS_REGION: us-east-1
   AWS_PLATFORM: Python
@@ -99,5 +100,5 @@ jobs:
           echo -e "${{ secrets.SSH_PRIVATE_KEY }}" > $HOME/.ssh/eventify-key-pair.pem
           chmod 777 $HOME/.ssh/eventify-key-pair.pem
           eb init -i ${{env.APP_NAME}} -p ${{env.AWS_PLATFORM}} -k "eventify-key-pair" --region ${{env.AWS_REGION}}
-          eb deploy ${{env.APP_NAME}} --version ${AWS_VERSION_LABEL}
+          eb deploy ${{env.APP_ENV}} --version ${AWS_VERSION_LABEL}
           echo "Deploy finished"
