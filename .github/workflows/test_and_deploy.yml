@@ -10,9 +10,9 @@ env:
 
 on:
   push:
-    branches: [ master ]
+    branches: [ 44-t9-continous-integration ]
   pull_request:
-    branches: [ master ]
+    branches: [ 44-t9-continous-integration ]
 
 jobs:
   test:
