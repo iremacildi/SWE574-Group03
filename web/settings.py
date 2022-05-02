@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'actstream', 
     'django_jsonfield_backport',
     'django_elasticsearch_dsl',
+    'django_seed',
   
 ]
 STAR_RATINGS_CLEARABLE = True
