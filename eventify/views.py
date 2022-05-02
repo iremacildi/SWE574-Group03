@@ -49,14 +49,14 @@ class PostListView(ListView):
 
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
-                Q(content__unaccent__icontains=keyword) | Q(title__unaccent__icontains=keyword))
+                Q(content__unaccent__lower__icontains=keyword) | Q(title__unaccent__lower__icontains=keyword))
       
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
-                Q(content__unaccent__icontains=keyword) | Q(title__unaccent__icontains=keyword) & Q(category__unaccent__icontains=cat))
+                Q(content__unaccent__lower__icontains=keyword) | Q(title__unaccent__lower__icontains=keyword) & Q(category__unaccent__lower__icontains=cat))
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
@@ -106,14 +106,14 @@ class ServiceListView(ListView):
             km='all'
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
-                Q(content__unaccent__icontains=keyword) | Q(title__unaccent__icontains=keyword))
+                Q(content__unaccent__lower__icontains=keyword) | Q(title__unaccent__lower__icontains=keyword))
       
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
-                (Q(content__unaccent__icontains=keyword) | Q(title__unaccent__icontains=keyword)) & Q(category__unaccent__icontains=cat))
+                (Q(content__unaccent__lower__icontains=keyword) | Q(title__unaccent__lower__icontains=keyword)) & Q(category__unaccent__lower__icontains=cat))
 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
