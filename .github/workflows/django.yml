@@ -71,6 +71,6 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: eventify
           environment_name: Eventify-env
-          version_label: 12348
+          version_label: ${{env.APP_NAME}}-${{env.PIPELINE_ID}}
           region: "us-east-1"
           deployment_package: deploy.zip
