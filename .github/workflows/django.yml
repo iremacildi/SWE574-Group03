@@ -31,9 +31,7 @@ jobs:
         steps:
 
         - name: 'Checkout GitHub Action'
-          uses: actions/checkout@v2
-          with:
-            path: main
+          uses: actions/checkout@main
 
         - name: Set up Python 3.8
           uses: actions/setup-python@v3
@@ -55,18 +53,21 @@ jobs:
 
     create_eb_version:
       needs: [test]
+
       runs-on: ubuntu-latest
+
       steps:
+
         - name: 'Checkout GitHub Action'
-          uses: actions/checkout@v2
-          with:
-            path: main
+          uses: actions/checkout@main
+
         - name: Configure AWS credentials 
           uses: aws-actions/configure-aws-credentials@v1
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ env.AWS_REGION }}
+
         - run: |
             AWS_VERSION_LABEL=${{env.APP_NAME}}-${{env.PIPELINE_ID}}
 
@@ -82,22 +83,26 @@ jobs:
 
     deploy_aws:
       needs: [create_eb_version]
+
       runs-on: ubuntu-latest
+
       steps:
+
         - name: 'Checkout GitHub Action'
-          uses: actions/checkout@v2
-          with:
-            path: main
+          uses: actions/checkout@main
+
         - name: Set up Python 3.8 (needed for eb cli)
           uses: actions/setup-python@v1
           with:
             python-version: "3.8"
+
         - name: Configure AWS credentials 
           uses: aws-actions/configure-aws-credentials@v1
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ env.AWS_REGION }}
+
         - run: |
             AWS_VERSION_LABEL=${{env.APP_NAME}}-${{env.PIPELINE_ID}}
   
