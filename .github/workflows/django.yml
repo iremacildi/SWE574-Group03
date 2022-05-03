@@ -31,7 +31,9 @@ jobs:
         steps:
 
         - name: 'Checkout GitHub Action'
-          uses: actions/checkout@44-t9-continous-integration
+          uses: actions/checkout@v2
+          with:
+            path: 44-t9-continous-integration
 
         - name: Set up Python 3.8
           uses: actions/setup-python@v3
@@ -55,7 +57,10 @@ jobs:
       needs: [test]
       runs-on: ubuntu-latest
       steps:
-        - uses: actions/checkout@v2
+        - name: 'Checkout GitHub Action'
+          uses: actions/checkout@v2
+          with:
+            path: 44-t9-continous-integration
         - name: Configure AWS credentials 
           uses: aws-actions/configure-aws-credentials@v1
           with:
@@ -79,7 +84,10 @@ jobs:
       needs: [create_eb_version]
       runs-on: ubuntu-latest
       steps:
-        - uses: actions/checkout@v2
+        - name: 'Checkout GitHub Action'
+          uses: actions/checkout@v2
+          with:
+            path: 44-t9-continous-integration
         - name: Set up Python 3.8 (needed for eb cli)
           uses: actions/setup-python@v1
           with:
