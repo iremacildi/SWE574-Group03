@@ -8,7 +8,6 @@ env:
   APP_NAME: eventify
   APP_ENV: Eventify-env
   S3_BUCKET: elasticbeanstalk-us-east-1-407376927836
-  AWS_REGION: us-east-1
   AWS_PLATFORM: Python
   PIPELINE_ID: ${GITHUB_RUN_ID}-${GITHUB_RUN_NUMBER}
 
@@ -66,7 +65,7 @@ jobs:
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ env.AWS_REGION }}
+            aws-region: us-east-1
 
         - run: |
             AWS_VERSION_LABEL=${{env.APP_NAME}}-${{env.PIPELINE_ID}}
@@ -101,7 +100,7 @@ jobs:
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ env.AWS_REGION }}
+            aws-region: us-east-1
 
         - run: |
             AWS_VERSION_LABEL=${{env.APP_NAME}}-${{env.PIPELINE_ID}}
