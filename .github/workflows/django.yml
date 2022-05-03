@@ -31,7 +31,7 @@ jobs:
         steps:
 
         - name: 'Checkout GitHub Action'
-          uses: actions/checkout@main
+          uses: actions/checkout@v3
 
         - name: Set up Python 3.8
           uses: actions/setup-python@v3
@@ -59,7 +59,7 @@ jobs:
       steps:
 
         - name: 'Checkout GitHub Action'
-          uses: actions/checkout@main
+          uses: actions/checkout@v3
 
         - name: Configure AWS credentials 
           uses: aws-actions/configure-aws-credentials@v1
@@ -89,7 +89,7 @@ jobs:
       steps:
 
         - name: 'Checkout GitHub Action'
-          uses: actions/checkout@main
+          uses: actions/checkout@v3
 
         - name: Set up Python 3.8 (needed for eb cli)
           uses: actions/setup-python@v1
