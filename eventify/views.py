@@ -1,9 +1,11 @@
 import datetime
-from lib2to3.pgen2.token import EQUAL
-import time
+from pyexpat import model
 import django
 from django.forms.widgets import DateInput, TimeInput
 from django.http.response import Http404, HttpResponse
+
+import users
+from eventify.ViewExtentions import OverRideDeleteView
 from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent,Approved
 from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
@@ -22,6 +24,9 @@ from django.views.generic import (
 )
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
+from datetime import date
+from actstream.actions import follow, unfollow, action
+from actstream.models import user_stream, Action, following, followers
 from datetime import date, timezone
 from datetime import timedelta
 
@@ -70,6 +75,19 @@ class PostListView(ListView):
         else:
             return object_list
 
+class FeedView(ListView):
+    model = Action
+    template_name = 'eventify/feed.html'
+    context_object_name = 'stream'
+    paginate_by = 10
+
+    def get_queryset(self):
+        stream = user_stream(self.request.user)
+        my_list = []
+        for stream_item in stream:
+            my_list.append(stream_item)
+        return my_list
+
 class ServiceListView(ListView):
     model = Service
     template_name = 'eventify/services.html'
@@ -110,9 +128,9 @@ class ServiceListView(ListView):
             for item in object_list:
                 if item.tempLocation<float(km):
                     my_list.append(item)
-            return my_list
+            return my_list.filter(IsCancelled=False)
         else:
-            return object_list
+            return object_list.filter(IsCancelled=False)
 
 class UserListView(ListView):
     model = User
@@ -183,6 +201,8 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        event = form.save()
+        action.send(self.request.user, verb="created event", target=event)
         return super().form_valid(form)
 
 class ServiceCreateView(LoginRequiredMixin, CreateView):
@@ -191,6 +211,8 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        service = form.save()
+        action.send(self.request.user, verb="created service", target=service)
         return super().form_valid(form)
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -203,6 +225,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        action.send(self.request.user, verb="updated event", target=form.instance)
         return super().form_valid(form)
 
     def test_func(self):
@@ -221,6 +244,7 @@ class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        action.send(self.request.user, verb="updated service", target=form.instance)
         return super().form_valid(form)
 
     def test_func(self):
@@ -244,7 +268,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 def about(request):
     return render(request, 'eventify/about.html', {'title': 'About'})
 
-class ServiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class ServiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, OverRideDeleteView):
     model = Service
     success_url = '/'
 
@@ -294,7 +318,7 @@ def approved(request, pk):
                             xowner.save()
 
 
-            messages.success(request, "Successfully comfirmed")
+            messages.success(request, "Successfully confirmed")
         else:
             service.isGiven=False
             service.save()
@@ -324,10 +348,10 @@ def approved(request, pk):
                  return redirect('service_detail', pk=pk)  
 
     else:    
-        messages.warning(request, "You already comfirmed") 
+        messages.warning(request, "You already confirmed") 
         return redirect('service_detail', pk=pk)
     if count==1:
-         messages.warning(request, "You already comfirmed")   
+         messages.warning(request, "You already confirmed")   
     return redirect('service_detail', pk=pk)
 
 @login_required
@@ -358,6 +382,7 @@ def register_event(request, pk):
         except:
             pass
         RegisterEvent(author=user, post=post,title=post.title,username=user.username).save()
+        action.send(request.user, verb="registered event", target=event)
         messages.success(request, "You register event successfully")
         return redirect('post_detail', pk=pk) 
        
@@ -370,12 +395,25 @@ def unregister_event(request, pk):
     if request.method == 'POST':
         ids=request.POST.get('user_id')
         post_id=request.POST.get('post_id')
-        RegisterEvent.objects.filter(author_id=ids,post_id=post_id).delete()
+        event = RegisterEvent.objects.filter(author_id=ids,post_id=post_id)
+        event.delete()
+        action.send(request.user, verb="unregistered event", target=event)
         messages.success(request, "Successfully cancelled application")    
         return redirect('post_detail', pk=pk)
     else:
         return redirect('post_detail', pk=pk)
 
+@login_required
+def follow_unfollow_user(request, username):
+    other_user = get_object_or_404(User, username=username)
+    if request.method == 'POST': 
+        if 'unfollow' in request.POST:
+            unfollow(request.user, other_user)
+        elif 'follow' in request.POST:
+            follow(request.user, other_user, actor_only=False)
+        return redirect('profiledetail', username=username)
+    else:
+        return redirect('profiledetail', username=username)
 
 @login_required
 def register_service(request, pk):
@@ -406,6 +444,7 @@ def register_service(request, pk):
                 user.profile.credits-=service.duration
                 user.profile.reserved+=service.duration
                 user.save()
+                action.send(request.user, verb="sent registration request", target=service)
                 messages.success(request, "Registration request sent successfully")
                 return redirect('service_detail', pk=pk) 
        
@@ -423,6 +462,7 @@ def unregister_service(request, pk):
         user.profile.credits+=service.duration
         user.profile.reserved-=service.duration
         user.save()
+        action.send(request.user, verb="unregistered", target=service)
         messages.success(request, "Successfully cancelled application")    
         return redirect('service_detail', pk=pk)
     else:
@@ -437,3 +477,73 @@ def unregister_service(request, pk):
 #         return redirect('service_detail', pk=pk)
 #     else:
 #         return redirect('service_detail', pk=pk)     
+
+
+# @login_required
+# def follower_list_view(request, username):
+#     followers_list = followers(request.user)
+#     print(followers_list)
+    
+#     return redirect('followers_list', username=username)
+
+# @login_required
+# def following_list_view(request, username):
+#     following_list = following(request.user)
+#     print(following_list)
+    
+#     return redirect('following_list', username=username)
+
+
+
+
+class FollowersView(ListView):
+    model = Action
+    template_name = 'users/followers_list.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        username=self.kwargs.get('username')
+        if(username == ''):
+            followers_var = followers(self.request.user)
+        else:
+            followers_var = followers(User.objects.get(username=username))
+
+        followers_var = followers(User.objects.get(username=username))
+        followers_list = []
+        for stream_item in followers_var:
+            followers_list.append(stream_item)
+        context = {
+            'username': username,
+            'followers_list' : followers_list
+
+        }
+       
+        return context
+
+
+class FollowingView(ListView):
+    model = Action
+    template_name = 'users/following_list.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        username=self.kwargs.get('username')
+        if(username == ''):
+            following_var = following(self.request.user)
+        else:
+            following_var = following(User.objects.get(username=username))
+
+        following_list = []
+        for stream_item in following_var:
+            following_list.append(stream_item)
+        context = {
+            'username': username,
+            'following_list' : following_list
+
+        }
+       
+        return context
+
+

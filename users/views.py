@@ -1,12 +1,20 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 import users
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from eventify.models import Post, RegisterEvent, RegisterService,Service
 from .models import Profile
 from geopy.geocoders import Nominatim
+from django.views.generic import (
+    CreateView,
+    ListView,
+    DetailView,
+    UpdateView,
+    DeleteView
+)
 
 
 def register(request):

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
+from eventify.views import FollowersView,FollowingView
 from users import views as user_views
 
 from django.conf import settings
@@ -37,6 +38,9 @@ urlpatterns = [
     path('password-change/done/', auth_views.PasswordChangeDoneView.as_view(
         template_name='users/password_change_done.html'), name='password_change_done'),
     path('ratings/', include('star_ratings.urls', namespace='ratings')),    
+    path('user/<str:username>/followers_list', FollowersView.as_view(), name='followers_list'),
+    path('user/<str:username>/following_list', FollowingView.as_view(), name='following_list'),
+
 ]
 
 if settings.DEBUG:

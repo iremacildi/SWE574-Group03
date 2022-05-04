@@ -1,0 +1,25 @@
+{% extends "eventify/base.html" %}
+{% load activity_tags %}
+{% block content %}
+    <h1>Feed Page</h1>
+        {% activity_stream 'user' user %}
+        {% for action in stream %}
+            <article  class="media content-section">
+                <img class="rounded-circle article-img" src="{{action.actor.profile.image.url}}">
+                <div class="media-body">
+                    <div class="article-metadata">
+                        <a class="mr-2" href="{% url 'profiledetail' action.actor %}"> {{action.actor}}</a> <br/>
+                        <small class="text-muted" title="{{action.timestamp}}">{{action.timesince}} ago</small>
+                    </div>
+                    <div>
+                        {{action.verb}}
+                        {{action.object}}
+                        {% if action.target != null %}
+                            <a class="mr-2" href="{{action.target.get_absolute_url}}"> {{action.target}}</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+{% endblock content %}
+

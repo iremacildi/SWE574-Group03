@@ -53,8 +53,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'location_field.apps.DefaultConfig',
     'star_ratings',
-    
-
+    'django.contrib.sites',
+    'actstream', 
+    'django_jsonfield_backport'
   
 ]
 STAR_RATINGS_CLEARABLE = True
@@ -108,7 +109,8 @@ DATABASES = {
         'ENGINE': env('DB_ENGINE', default = 'django.db.backends.postgresql_psycopg2'),
         'NAME': env('DB_NAME', default='eventifydb'), 
         'USER': env('DB_USER', default='postgres'), 
-        'PASSWORD': env('DB_PASSWORD', default='Pass1234'),
+        # 'PASSWORD': env('DB_PASSWORD', default='Pass1234'),
+        'PASSWORD': env('DB_PASSWORD', default='q1w2e3'),
         'HOST': env('DB_HOST', default='127.0.0.1'), 
         # 'HOST': env('DB_HOST'), 
         'PORT': env('DB_PORT', default='5432'),
@@ -179,7 +181,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'tr'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'UTC'
 
@@ -187,7 +189,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -216,3 +218,13 @@ LOGIN_URL = 'login'
 # Email Settings
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+SITE_ID = 1
+
+ACTSTREAM_SETTINGS = {
+    'MANAGER': 'web.managers.MyActionManager',
+    'FETCH_RELATIONS': True,
+    'USE_PREFETCH': True,
+    'USE_JSONFIELD': True,
+    'GFK_FETCH_DEPTH': 1,
+}
