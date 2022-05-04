@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - 44-t9-continous-integration
+      - master
 name: Eventify Pipeline
 
 env:
@@ -33,7 +33,7 @@ jobs:
         - name: 'Checkout GitHub Action'
           uses: actions/checkout@v3
           with:
-            ref: 44-t9-continous-integration
+            ref: master
 
         - name: Set up Python 3.8
           uses: actions/setup-python@v3
