@@ -2,9 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
 from location_field.models.plain import PlainLocationField
+from simple_history.models import HistoricalRecords
 
 
 class Profile(models.Model):
+    history = HistoricalRecords()
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
     location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)

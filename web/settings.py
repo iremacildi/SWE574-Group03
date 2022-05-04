@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'actstream', 
     'django_jsonfield_backport',
     'controlcenter',
+    'simple_history',
   
 ]
 CONTROLCENTER_DASHBOARDS = (
@@ -73,7 +74,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware'
+    'django.middleware.common.CommonMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 

@@ -188,6 +188,8 @@ class ServiceDetailView(LoginRequiredMixin,DetailView):
         location = geolocator.reverse(service.location,timeout=20)
         context = super().get_context_data(**kwargs)
         context['registerservice'] = RegisterService.objects.filter(service_id=pk,approved_register=True)
+        service.currentAtt= RegisterService.objects.filter(service_id=pk,approved_register=True).count()
+        service.save()
         context['unRegister'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=False)
         context['approved'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=True)
         context['address']=location.address
