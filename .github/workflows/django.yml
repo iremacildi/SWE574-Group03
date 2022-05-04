@@ -1,0 +1,76 @@
+on:
+  push:
+    branches:
+      - 44-t9-continous-integration
+name: Eventify Pipeline
+
+env:
+  APP_NAME: eventify
+  APP_ENV: Eventify-env
+  S3_BUCKET: elasticbeanstalk-us-east-1-407376927836
+  AWS_REGION: us-east-1
+  AWS_PLATFORM: Python
+  PIPELINE_ID: ${{github.run_id}}-${{github.run_number}}
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        
+        services:
+          postgres:
+            image: postgres:14.1
+            env:
+              POSTGRES_DB: github_actions
+              POSTGRES_USER: postgres
+              POSTGRES_PASSWORD: postgres
+            ports:
+            - 5432:5432
+            # needed because the postgres container does not provide a healthcheck
+            options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+        steps:
+
+        - name: 'Checkout GitHub Action'
+          uses: actions/checkout@v3
+          with:
+            ref: 44-t9-continous-integration
+
+        - name: Set up Python 3.8
+          uses: actions/setup-python@v3
+          with:
+            python-version: 3.8
+          
+        - name: Install Dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+            pip install pytest-django
+        
+        - name: Run migrations
+          run: python manage.py migrate
+          
+        - name: Run Tests
+          run: |
+            python manage.py test
+
+    deploy:
+      needs: [test]
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x '*.git*'
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: eventify
+          environment_name: Eventify-env
+          version_label: ${{env.APP_NAME}}-${{env.PIPELINE_ID}}
+          region: "us-east-1"
+          deployment_package: deploy.zip
