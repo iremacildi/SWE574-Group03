@@ -4,12 +4,6 @@
 {% load ratings %}
 
 
-
-
-
-
-
-
 <div class="content-section">
 
     <!-- Author information -->
@@ -21,19 +15,7 @@
         </div>
         {% if object.author_id is not user.id %}
         {% if  isLate is  False %}
-        <!-- <form method="POST" action="{% url 'register_service' object.id %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <input type="hidden" name="user_id" value="{{user.id}}">
-            </div>
-                {% if unRegister|length is not 0 %}   
-                 <button style="background-color: brown;"class="btn btn-primary" name="service_id" value="{{object.id}}"type="submit">Cancel Application</button> 
-                {% elif approved|length is not 0 %}
-                <p  style="background-color:rgb(0, 145, 43);" class="btn btn-primary" name="service_id" value="{{object.id}}"type="submit">Approved<p> 
-                {% else %}
-                <button class="btn btn-primary" name="service_id" value="{{object.id}}"type="submit">Apply</button> 
-                {% endif %}
-        </form> -->
+
         {% if unRegister|length is not 0 %}  
         <form method="POST" action="{% url 'unregister_service' object.id %}">
             {% csrf_token %}
@@ -63,11 +45,9 @@
           
         </form>
         {% endif %}
-
-        
         
         {% else %}
-        {% if object.IsCancelled %}
+        {% if object.IsCancelled is True%}
         <div class="alert alert-warning">
            Cancalled
           </div>
@@ -93,10 +73,9 @@
             <a class="btn btn-danger btn-sm mt-1 mb-1 float-right mr-2 "
                 href="{% url 'service_delete' object.id %}">Cancel</a>
                  {% endif %}
-            {%else%}
+            {%elif isLate is  False and object.IsCancelled is True %}
             <a class="btn btn-danger btn-sm mt-1 mb-1 float-right mr-2 "
             href="#">Cancelled</a>
-           
             {% endif %}
         </p>
     </div>
