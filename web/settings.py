@@ -55,9 +55,13 @@ INSTALLED_APPS = [
     'star_ratings',
     'django.contrib.sites',
     'actstream', 
-    'django_jsonfield_backport'
+    'django_jsonfield_backport',
+    'controlcenter',
   
 ]
+CONTROLCENTER_DASHBOARDS = (
+    ('mydash', 'web.dashboard.MyDashboard'),
+)
 STAR_RATINGS_CLEARABLE = True
 
 MIDDLEWARE = [
