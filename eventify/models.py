@@ -23,8 +23,7 @@ def upload_post_to(instance,filename):
 
 
 class Post(models.Model):
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     content = models.TextField()
     location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
@@ -33,11 +32,8 @@ class Post(models.Model):
     eventdate = models.DateField(default=timezone.now)
     eventtime=models.TimeField()
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar')
-
-    duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
-     )
-    capacity=models.IntegerField(default=1,validators=[MaxValueValidator(100), MinValueValidator(1)]
-     )
+    duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)])
+    capacity=models.IntegerField(default=1,validators=[MaxValueValidator(100), MinValueValidator(1)])
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
@@ -55,17 +51,14 @@ class Post(models.Model):
         return reverse('post_detail', kwargs={'pk': self.pk})
 
 class Service(models.Model):
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     eventdate = models.DateField(default=timezone.now)
     tempLocation = models.TextField(blank=True)
     eventtime=models.TimeField()
-    duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
-     )
+    duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)])
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar') 
-    capacity=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)]
-     )
+    capacity=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)])
     location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
     content = models.TextField()
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
