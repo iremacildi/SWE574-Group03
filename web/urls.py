@@ -6,9 +6,11 @@ from users import views as user_views
 
 from django.conf import settings
 from django.conf.urls.static import static
+from controlcenter.views import controlcenter
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('admin/dashboard/', controlcenter.urls),
     #  urls
     path('', include('eventify.urls')),
     # Authentication Urls
