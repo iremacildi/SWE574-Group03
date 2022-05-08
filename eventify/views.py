@@ -91,13 +91,15 @@ class FeedView(ListView):
         return my_list
 
 class NotificationsListView(ListView):
+    model = Notification
     template_name = 'eventify/notifications_list.html'
+    context_object_name = 'instance'
 
     def get_queryset(self):
         qs = Notification.objects.filter(recipient=self.request.user.id)
         qs.mark_all_as_read()
         return qs
-
+        
 class ServiceListView(ListView):
     model = Service
     template_name = 'eventify/services.html'
@@ -215,10 +217,6 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         event = form.save()
         action.send(self.request.user, verb="created an event", target=event)
-        # users_followers = followers(self.request.user)
-        # sender = self.request.user
-        # receiver = users_followers
-        # notify.send(sender, recipient=receiver, verb='created an event.', target=event)
         return super().form_valid(form)
 
 class ServiceCreateView(LoginRequiredMixin, CreateView):

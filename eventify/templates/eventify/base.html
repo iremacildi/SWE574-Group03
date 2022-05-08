@@ -120,8 +120,7 @@
             <a class="nav-item nav-link">Credits: {{user.profile.credits}}</a>
             <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
             <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
-            <a class="notification" data-toggle="tooltip" data-placement="right" title="Notifications"
-              href="notifications" role="button" target="template">
+            <a class="notification" href="{% url 'notifications' %}" role="button" target="template">
               <i class="fa fa-bell" style="font-size:24px"></i> <span class="badge">{% live_notify_badge %}</span>
             </a>
             {% else %}
