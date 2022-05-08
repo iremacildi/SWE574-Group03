@@ -29,6 +29,8 @@ from actstream.actions import follow, unfollow, action
 from actstream.models import user_stream, Action, following, followers
 from datetime import date, timezone
 from datetime import timedelta
+from notifications.signals import notify
+from notifications.models import Notification
 
 class PostListView(ListView):
     model = Post
@@ -88,6 +90,16 @@ class FeedView(ListView):
             my_list.append(stream_item)
         return my_list
 
+class NotificationsListView(ListView):
+    model = Notification
+    template_name = 'eventify/notifications_list.html'
+    context_object_name = 'instance'
+
+    def get_queryset(self):
+        qs = Notification.objects.filter(recipient=self.request.user.id)
+        qs.mark_all_as_read()
+        return qs
+        
 class ServiceListView(ListView):
     model = Service
     template_name = 'eventify/services.html'
@@ -204,7 +216,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         event = form.save()
-        action.send(self.request.user, verb="created event", target=event)
+        action.send(self.request.user, verb="created an event", target=event)
         return super().form_valid(form)
 
 class ServiceCreateView(LoginRequiredMixin, CreateView):
@@ -214,7 +226,7 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         service = form.save()
-        action.send(self.request.user, verb="created service", target=service)
+        action.send(self.request.user, verb="created a service", target=service)
         return super().form_valid(form)
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -227,7 +239,13 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        action.send(self.request.user, verb="updated event", target=form.instance)
+        action.send(self.request.user, verb="updated an event", target=form.instance)
+        attendees_ids = RegisterEvent.objects.filter(post_id=form.instance.id).values('author_id')
+        if attendees_ids is not None:
+            attendees = User.objects.filter(id__in=attendees_ids)
+            sender = self.request.user
+            receiver = attendees
+            notify.send(sender, recipient=receiver, verb='updated by', target=form.instance)
         return super().form_valid(form)
 
     def test_func(self):
@@ -247,6 +265,12 @@ class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         action.send(self.request.user, verb="updated service", target=form.instance)
+        attendees_ids = RegisterService.objects.filter(service_id=form.instance.id).values('author_id')
+        if attendees_ids is not None:
+            attendees = User.objects.filter(id__in=attendees_ids)
+            sender = self.request.user
+            receiver = attendees
+            notify.send(sender, recipient=receiver, verb='updated by', target=form.instance)
         return super().form_valid(form)
 
     def test_func(self):
@@ -384,7 +408,7 @@ def register_event(request, pk):
         except:
             pass
         RegisterEvent(author=user, post=post,title=post.title,username=user.username).save()
-        action.send(request.user, verb="registered event", target=event)
+        # action.send(request.user, verb="registered event", target=event)
         messages.success(request, "You register event successfully")
         return redirect('post_detail', pk=pk) 
        
@@ -399,7 +423,7 @@ def unregister_event(request, pk):
         post_id=request.POST.get('post_id')
         event = RegisterEvent.objects.filter(author_id=ids,post_id=post_id)
         event.delete()
-        action.send(request.user, verb="unregistered event", target=event)
+        # action.send(request.user, verb="unregistered event", target=event)
         messages.success(request, "Successfully cancelled application")    
         return redirect('post_detail', pk=pk)
     else:

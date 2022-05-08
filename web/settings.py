@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'django_jsonfield_backport',
     'controlcenter',
     'simple_history',
-  
+    'notifications',
 ]
 CONTROLCENTER_DASHBOARDS = (
     ('mydash', 'web.dashboard.MyDashboard'),
