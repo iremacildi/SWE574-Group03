@@ -55,9 +55,14 @@ INSTALLED_APPS = [
     'star_ratings',
     'django.contrib.sites',
     'actstream', 
-    'django_jsonfield_backport'
+    'django_jsonfield_backport',
+    'controlcenter',
+    'simple_history',
   
 ]
+CONTROLCENTER_DASHBOARDS = (
+    ('mydash', 'web.dashboard.MyDashboard'),
+)
 STAR_RATINGS_CLEARABLE = True
 
 MIDDLEWARE = [
@@ -69,7 +74,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware'
+    'django.middleware.common.CommonMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 
@@ -109,8 +115,8 @@ DATABASES = {
         'ENGINE': env('DB_ENGINE', default = 'django.db.backends.postgresql_psycopg2'),
         'NAME': env('DB_NAME', default='eventifydb'), 
         'USER': env('DB_USER', default='postgres'), 
-        # 'PASSWORD': env('DB_PASSWORD', default='Pass1234'),
-        'PASSWORD': env('DB_PASSWORD', default='q1w2e3'),
+         'PASSWORD': env('DB_PASSWORD', default='Pass1234'),
+        #'PASSWORD': env('DB_PASSWORD', default='q1w2e3'),
         'HOST': env('DB_HOST', default='127.0.0.1'), 
         # 'HOST': env('DB_HOST'), 
         'PORT': env('DB_PORT', default='5432'),

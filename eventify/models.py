@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from location_field.models.plain import PlainLocationField
+from simple_history.models import HistoricalRecords
 
 
 CATEGORY_CHOICE = (
@@ -23,7 +24,9 @@ def upload_post_to(instance,filename):
 
 
 class Post(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    history = HistoricalRecords()
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     content = models.TextField()
     location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
@@ -51,7 +54,9 @@ class Post(models.Model):
         return reverse('post_detail', kwargs={'pk': self.pk})
 
 class Service(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    history = HistoricalRecords()
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     eventdate = models.DateField(default=timezone.now)
     tempLocation = models.TextField(blank=True)
@@ -67,6 +72,7 @@ class Service(models.Model):
     isLate=BooleanField(default=False)
     isGiven=BooleanField(default=False)
     IsCancelled= models.BooleanField(default=False)
+    currentAtt=models.IntegerField(default=0)
  
 
     class Meta:
@@ -79,6 +85,7 @@ class Service(models.Model):
         return reverse('service_detail', kwargs={'pk': self.pk}) 
 
 class ServiceComment(models.Model):
+    history = HistoricalRecords()
     service = models.ForeignKey(Service, related_name='servicecomment', on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text = models.TextField()
@@ -152,6 +159,7 @@ class Comment(models.Model):
     text = models.TextField()
     created_date = models.DateTimeField(default=timezone.now)
     approved_comment = models.BooleanField(default=True)
+    history = HistoricalRecords()
 
     def approve(self):
         self.approved_comment = True

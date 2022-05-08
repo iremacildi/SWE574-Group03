@@ -25,4 +25,4 @@ django-jsonfield-backport==1.0.5
 django-activity-stream==1.4.0
 cryptography==36.0.0
 cffi==1.15.0
-
+django-simple-history

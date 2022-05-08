@@ -92,7 +92,7 @@ class ServiceListView(ListView):
     model = Service
     template_name = 'eventify/services.html'
     context_object_name = 'services'
-    paginate_by = 5
+    paginate_by = 4
 
     def get_queryset(self):
         my_list = []
@@ -106,17 +106,17 @@ class ServiceListView(ListView):
             km='all'
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword))
+                Q(content__icontains=keyword) | Q(title__icontains=keyword),IsCancelled=False)
       
         elif keyword == '' and cat!="all":
-            object_list = self.model.objects.filter(category=cat)
+            object_list = self.model.objects.filter(category=cat,IsCancelled=False)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
-                (Q(content__icontains=keyword) | Q(title__icontains=keyword)) & Q(category__icontains=cat))
+                Q(content__icontains=keyword) | Q(title__icontains=keyword)) & Q(category__icontains=cat,IsCancelled=False,)
 
         elif keyword=='' and cat=='all':
-            object_list = self.model.objects.all()
+            object_list = self.model.objects.filter(IsCancelled=False)
 
         for item in object_list:
             try:
@@ -128,9 +128,9 @@ class ServiceListView(ListView):
             for item in object_list:
                 if item.tempLocation<float(km):
                     my_list.append(item)
-            return my_list.filter(IsCancelled=False)
+            return my_list
         else:
-            return object_list.filter(IsCancelled=False)
+            return object_list
 
 class UserListView(ListView):
     model = User
@@ -164,7 +164,7 @@ class PostDetailView(LoginRequiredMixin,DetailView):
         event=Post.objects.get(id=pk)
         if event.eventdate < date.today():
             event.isLate=True
-        location = geolocator.reverse(event.location)
+        location = geolocator.reverse(event.location,timeout=20)
         context['registerevent'] = RegisterEvent.objects.filter(post_id=pk,approved_register=True)
         context['unRegister'] = RegisterEvent.objects.filter(post_id=pk,author_id=self.request.user.id,approved_register=True)
         context['address']=location.address
@@ -182,12 +182,14 @@ class ServiceDetailView(LoginRequiredMixin,DetailView):
         service=Service.objects.get(id=pk)
         if service.eventdate < date.today():
            service.isLate=True
-        elif service.eventdate == date.today() and service.eventtime < (datetime.datetime.now()+datetime.timedelta(hours=4)).time():
+        elif service.eventdate == date.today() and service.eventtime < (datetime.datetime.now()+datetime.timedelta(hours=1)).time():
             service.isLate=True
 
-        location = geolocator.reverse(service.location)
+        location = geolocator.reverse(service.location,timeout=20)
         context = super().get_context_data(**kwargs)
         context['registerservice'] = RegisterService.objects.filter(service_id=pk,approved_register=True)
+        service.currentAtt= RegisterService.objects.filter(service_id=pk,approved_register=True).count()
+        service.save()
         context['unRegister'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=False)
         context['approved'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=True)
         context['address']=location.address
