@@ -1,4 +1,6 @@
 from django.urls import path, include
+from django.conf.urls import url
+import notifications.urls
 from . import views
 from .views import (
     FollowersView,
@@ -15,6 +17,7 @@ from .views import (
     ServiceDeleteView,
     FeedView,
     FollowersView,
+    NotificationsListView,
     # UserServiceListView,
     add_comment,
     add_servicecomment,
@@ -37,6 +40,11 @@ urlpatterns = [
     path('service/new/', ServiceCreateView.as_view(), name='service_create'),
     path('service/<int:pk>/update/', ServiceUpdateView.as_view(), name='service_update'),
     path('service/<int:pk>/delete/', ServiceDeleteView.as_view(), name='service_delete'),
+    path('notifications', NotificationsListView.as_view(), name='notifications'),
+    path('about/', views.about, name='about'),
+    path('post/<int:pk>/comment/', add_comment, name='add_comment'),
+    path('post/<int:pk>/postregister/', register_event, name='register_event'),
+    path('post/<int:pk>/unpostregister/', unregister_event, name='unregister_event'),
     path('service/<int:pk>/serviceregister/', register_service, name='register_service'),
     path('service/<int:pk>/unserviceregister/', unregister_service, name='unregister_service'),
     path('service/<int:pk>/servicecomment/', add_servicecomment, name='add_servicecomment'),
@@ -60,8 +68,5 @@ urlpatterns = [
     path('user/<str:username>/follow-unfollow/', follow_unfollow_user, name='follow_unfollow_user'),
     path('feed', FeedView.as_view(), name='feed'),
     path('activity/', include('actstream.urls')),
-
-
-
-
+    url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
 ]

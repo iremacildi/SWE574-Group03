@@ -25,5 +25,7 @@ Code can be reached from development branch.
 > run python manage.py migrate actstream 0001  
 > set USE_JSONFIELD setting as True  
 > run python manage.py migrate actstream
+## Apply Notifications Migration
+> run python manage.py migrate notifications
 ## Run server
 > python manage.py runserver
