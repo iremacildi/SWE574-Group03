@@ -54,7 +54,7 @@ def profile(request):
         service_list=Service.objects.filter(author_id=request.user.id).order_by('-date_posted')
         registerservice=RegisterService.objects.filter(owner=request.user.id,approved_register=False)
         myregisterservice=RegisterService.objects.filter(author_id=request.user.id)
-        location = geolocator.reverse(profile.location)
+        location = geolocator.reverse(profile.location,timeout=20)
 
     context = {
         'u_form': u_form,

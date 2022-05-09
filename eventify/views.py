@@ -29,6 +29,8 @@ from actstream.actions import follow, unfollow, action
 from actstream.models import user_stream, Action, following, followers
 from datetime import date, timezone
 from datetime import timedelta
+from notifications.signals import notify
+from notifications.models import Notification
 
 class PostListView(ListView):
     model = Post
@@ -88,11 +90,21 @@ class FeedView(ListView):
             my_list.append(stream_item)
         return my_list
 
+class NotificationsListView(ListView):
+    model = Notification
+    template_name = 'eventify/notifications_list.html'
+    context_object_name = 'instance'
+
+    def get_queryset(self):
+        qs = Notification.objects.filter(recipient=self.request.user.id)
+        qs.mark_all_as_read()
+        return qs
+        
 class ServiceListView(ListView):
     model = Service
     template_name = 'eventify/services.html'
     context_object_name = 'services'
-    paginate_by = 5
+    paginate_by = 4
 
     def get_queryset(self):
         my_list = []
@@ -106,17 +118,17 @@ class ServiceListView(ListView):
             km='all'
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword))
+                Q(content__icontains=keyword) | Q(title__icontains=keyword),IsCancelled=False)
       
         elif keyword == '' and cat!="all":
-            object_list = self.model.objects.filter(category=cat)
+            object_list = self.model.objects.filter(category=cat,IsCancelled=False)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
-                (Q(content__icontains=keyword) | Q(title__icontains=keyword)) & Q(category__icontains=cat))
+                Q(content__icontains=keyword) | Q(title__icontains=keyword)) & Q(category__icontains=cat,IsCancelled=False,)
 
         elif keyword=='' and cat=='all':
-            object_list = self.model.objects.all()
+            object_list = self.model.objects.filter(IsCancelled=False)
 
         for item in object_list:
             try:
@@ -128,9 +140,9 @@ class ServiceListView(ListView):
             for item in object_list:
                 if item.tempLocation<float(km):
                     my_list.append(item)
-            return my_list.filter(IsCancelled=False)
+            return my_list
         else:
-            return object_list.filter(IsCancelled=False)
+            return object_list
 
 class UserListView(ListView):
     model = User
@@ -164,7 +176,7 @@ class PostDetailView(LoginRequiredMixin,DetailView):
         event=Post.objects.get(id=pk)
         if event.eventdate < date.today():
             event.isLate=True
-        location = geolocator.reverse(event.location)
+        location = geolocator.reverse(event.location,timeout=20)
         context['registerevent'] = RegisterEvent.objects.filter(post_id=pk,approved_register=True)
         context['unRegister'] = RegisterEvent.objects.filter(post_id=pk,author_id=self.request.user.id,approved_register=True)
         context['address']=location.address
@@ -182,12 +194,14 @@ class ServiceDetailView(LoginRequiredMixin,DetailView):
         service=Service.objects.get(id=pk)
         if service.eventdate < date.today():
            service.isLate=True
-        elif service.eventdate == date.today() and service.eventtime < (datetime.datetime.now()+datetime.timedelta(hours=4)).time():
+        elif service.eventdate == date.today() and service.eventtime < (datetime.datetime.now()+datetime.timedelta(hours=1)).time():
             service.isLate=True
 
-        location = geolocator.reverse(service.location)
+        location = geolocator.reverse(service.location,timeout=20)
         context = super().get_context_data(**kwargs)
         context['registerservice'] = RegisterService.objects.filter(service_id=pk,approved_register=True)
+        service.currentAtt= RegisterService.objects.filter(service_id=pk,approved_register=True).count()
+        service.save()
         context['unRegister'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=False)
         context['approved'] =RegisterService.objects.filter(service_id=pk,author_id=self.request.user.id,approved_register=True)
         context['address']=location.address
@@ -202,7 +216,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         event = form.save()
-        action.send(self.request.user, verb="created event", target=event)
+        action.send(self.request.user, verb="created an event", target=event)
         return super().form_valid(form)
 
 class ServiceCreateView(LoginRequiredMixin, CreateView):
@@ -212,7 +226,7 @@ class ServiceCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         service = form.save()
-        action.send(self.request.user, verb="created service", target=service)
+        action.send(self.request.user, verb="created a service", target=service)
         return super().form_valid(form)
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -225,7 +239,13 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        action.send(self.request.user, verb="updated event", target=form.instance)
+        action.send(self.request.user, verb="updated an event", target=form.instance)
+        attendees_ids = RegisterEvent.objects.filter(post_id=form.instance.id).values('author_id')
+        if attendees_ids is not None:
+            attendees = User.objects.filter(id__in=attendees_ids)
+            sender = self.request.user
+            receiver = attendees
+            notify.send(sender, recipient=receiver, verb='updated by', target=form.instance)
         return super().form_valid(form)
 
     def test_func(self):
@@ -245,6 +265,12 @@ class ServiceUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         action.send(self.request.user, verb="updated service", target=form.instance)
+        attendees_ids = RegisterService.objects.filter(service_id=form.instance.id).values('author_id')
+        if attendees_ids is not None:
+            attendees = User.objects.filter(id__in=attendees_ids)
+            sender = self.request.user
+            receiver = attendees
+            notify.send(sender, recipient=receiver, verb='updated by', target=form.instance)
         return super().form_valid(form)
 
     def test_func(self):
@@ -382,7 +408,7 @@ def register_event(request, pk):
         except:
             pass
         RegisterEvent(author=user, post=post,title=post.title,username=user.username).save()
-        action.send(request.user, verb="registered event", target=event)
+        # action.send(request.user, verb="registered event", target=event)
         messages.success(request, "You register event successfully")
         return redirect('post_detail', pk=pk) 
        
@@ -397,7 +423,7 @@ def unregister_event(request, pk):
         post_id=request.POST.get('post_id')
         event = RegisterEvent.objects.filter(author_id=ids,post_id=post_id)
         event.delete()
-        action.send(request.user, verb="unregistered event", target=event)
+        # action.send(request.user, verb="unregistered event", target=event)
         messages.success(request, "Successfully cancelled application")    
         return redirect('post_detail', pk=pk)
     else:

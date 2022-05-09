@@ -1,0 +1,27 @@
+{% extends "eventify/base.html" %}
+{% block content %}
+<div class="container-fluid bg-light">
+    <div class="row">
+        <div class="col-1">
+            <h2 class="ml-3 mt-3">Notifications</h2>
+        </div>
+    </div>
+
+    <div class="row bg-dark pt-1"></div>
+
+    <div class="row" style="height: 90vh;">
+        <div class="divTable greyGridTable mt-3 col-12">
+            <div class="divTableBody">
+                {% for instance in object_list %}
+                <div class="divTableRow">
+                    <h4>
+                        <a href="{{instance.target.get_absolute_url}}"> {{instance.target}}</a> {{instance.verb}}
+                        <a class="mr-2" href="{% url 'profiledetail' instance.actor %}">{{instance.actor}}</a>
+                    </h4>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
