@@ -76,8 +76,3 @@ jobs:
           version_label: ${{env.APP_NAME}}-${{env.PIPELINE_ID}}
           region: "us-east-1"
           deployment_package: deploy.zip
-          
-      - name: Run migrations
-        run: |
-          python manage.py migrate
-          python manage.py migrate notifications
