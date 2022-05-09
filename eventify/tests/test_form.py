@@ -34,7 +34,7 @@ class ServiceFormTest(TestCase):
 
 
             })
-        self.assertTrue(testForm.is_valid())
+        self.assertFalse(testForm.is_valid())
 
 
     
