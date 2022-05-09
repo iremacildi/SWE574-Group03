@@ -47,7 +47,9 @@ jobs:
             pip install pytest-django
         
         - name: Run migrations
-          run: python manage.py migrate
+          run: |
+            python manage.py migrate
+            python manage.py migrate notifications
           
         - name: Run Tests
           run: |
