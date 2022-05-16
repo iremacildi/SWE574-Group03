@@ -170,6 +170,9 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.author
+
+
+
         
 # class Friend(models.Model):
 #     users = models.ManyToManyField(User)

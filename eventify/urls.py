@@ -2,6 +2,7 @@ from django.urls import path, include
 from django.conf.urls import url
 import notifications.urls
 from . import views
+
 from .views import (
     FollowersView,
     PostListView,
@@ -28,7 +29,8 @@ from .views import (
     register_service,
     unregister_service,
     unregister_event,
-    approved
+    approved,
+    pie_chart_category_active
 )
 
 
@@ -69,4 +71,10 @@ urlpatterns = [
     path('feed', FeedView.as_view(), name='feed'),
     path('activity/', include('actstream.urls')),
     url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
+
+    # charts
+    path('api', views.ChartData.as_view(), name='api'),
+    path('api2', views.pie_chart_category_active_render, name='api2'),
+    path('api3', views.pie_chart_category_active, name='api3')
+
 ]
