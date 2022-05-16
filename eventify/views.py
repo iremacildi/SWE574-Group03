@@ -1,5 +1,7 @@
 import datetime
+from itertools import count
 from pyexpat import model
+from unicodedata import category
 import django
 from django.forms.widgets import DateInput, TimeInput
 from django.http import JsonResponse
@@ -37,6 +39,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Sum
 from django.http import JsonResponse
+
+from django.db.models import Count
 
 class PostListView(ListView):
     model = Post
@@ -611,11 +615,12 @@ def pie_chart_category_active(request):
     data = []
 
     #queryset = Service.objects.order_by('-currentAtt')[:5]
-    queryset = Service.objects.values('category').annotate(attendee_sum = Sum('currentAtt')).order_by('-attendee_sum')
-    print("I am here",queryset)
+    fieldname = 'category'
+    queryset = Service.objects.values(fieldname).order_by(fieldname).annotate(the_count=Count(fieldname))
+
     for service_loop in queryset:
         labels.append(service_loop['category'])
-        data.append(service_loop['attendee_sum'])
+        data.append(service_loop['the_count'])
 
     return JsonResponse(data= {
         'labels': labels,

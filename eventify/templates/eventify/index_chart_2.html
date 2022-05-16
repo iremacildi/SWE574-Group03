@@ -18,14 +18,13 @@
         success: function (data) {
 
           var ctx = $pieChart[0].getContext("2d");
-          console.log("data",data);
 
           new Chart(ctx, {
             type: 'bar',
             data: {
               labels: data.labels,
               datasets: [{
-                label: 'Attendee chart',
+                label: 'Service Number by Category',
                 backgroundColor: 'blue',
                 data: data.data
               }]          
@@ -37,7 +36,7 @@
               },
               title: {
                 display: true,
-                text: 'Attendee Bar Chart'
+                text: 'Services'
               }
             
             }
