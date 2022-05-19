@@ -1,6 +1,8 @@
 import datetime
 from itertools import count
+from multiprocessing import context
 from pyexpat import model
+from tracemalloc import start
 from unicodedata import category
 import django
 from django.forms.widgets import DateInput, TimeInput
@@ -9,7 +11,7 @@ from django.http.response import Http404, HttpResponse
 
 import users
 from eventify.ViewExtentions import OverRideDeleteView
-from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent,Approved
+from .models import  Post, Comment, RegisterService,Service, ServiceChart,ServiceComment,RegisterEvent,Approved
 from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -17,7 +19,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import PostForm, ServiceForm
+from .forms import PostForm, ServiceChartForm, ServiceForm
 from django.views.generic import (
     CreateView,
     ListView,
@@ -614,10 +616,21 @@ def pie_chart_category_active(request):
     labels = []
     data = []
 
-    #queryset = Service.objects.order_by('-currentAtt')[:5]
-    fieldname = 'category'
-    queryset = Service.objects.values(fieldname).order_by(fieldname).annotate(the_count=Count(fieldname))
+    #Filters for date
+    q1 = ServiceChart.objects.values('start_date').last()
+    q2 = ServiceChart.objects.values('end_date').last()
+    date1 = q1['start_date']
+    date2 = q2['end_date']
 
+    #Filters for attendee numbers
+    q3 = ServiceChart.objects.values('min_attendee').last()
+    q4 = ServiceChart.objects.values('max_attendee').last()
+    attendeeMin = q3['min_attendee']
+    attendeeMax = q4['max_attendee']
+
+    fieldname = 'category'
+    queryset = Service.objects.values(fieldname).filter(eventdate__range=[date1,date2]).filter(currentAtt__range=[attendeeMin,attendeeMax]).order_by(fieldname).annotate(the_count=Count(fieldname))
+    print(queryset)
     for service_loop in queryset:
         labels.append(service_loop['category'])
         data.append(service_loop['the_count'])
@@ -626,3 +639,16 @@ def pie_chart_category_active(request):
         'labels': labels,
         'data': data,
     })
+
+def service_chart(request):
+    form = ServiceChartForm()
+
+    if request.method == 'POST':
+        form = ServiceChartForm(request.POST)
+        if form.is_valid():
+            selection = form.save(commit=False)
+            selection.save()
+            return redirect('api2')
+
+    context = {'form':form}
+    return render(request, 'eventify/service_chart.html', context)

@@ -172,6 +172,11 @@ class Comment(models.Model):
         return self.author
 
 
+class ServiceChart(models.Model):
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField(default=timezone.now)
+    min_attendee=models.IntegerField(default=0)
+    max_attendee=models.IntegerField(default=0)
 
         
 # class Friend(models.Model):
