@@ -28,13 +28,13 @@ class ServiceFormTest(TestCase):
             'eventtime': '15:00:00',
             'category':'Seminar', 
             'duration':'5',
-            'capacity': '21',
+            'capacity': '20',
             'picture ': 'uploads/event_pictures/default.png',
             
 
 
             })
-        self.assertTrue(testForm.is_valid())
+        self.assertFalse(testForm.is_valid())
 
 
     
