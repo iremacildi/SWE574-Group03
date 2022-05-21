@@ -73,11 +73,11 @@ class UserRegisterFormTest(TestCase):
    
     def test_user_form__email_not_valid(self):
 
-        testUserForm = UserRegisterForm({
+        testUserForm = UserRegisterForm(data = {
             'first_name':'Arnold',
             'last_name':'Schwarzenegger', 
             'username':'ArnoldSchwarzenegger',
-            'email ':'ArnoldSchwarzenegger@',
+            'email':'ArnoldSchwarzenegger@',
             'password1': '2@Mt,Aj~',
             'password2':'2@Mt,Aj~', 
             })
@@ -85,11 +85,11 @@ class UserRegisterFormTest(TestCase):
     
     def test_user_form_first_last_name_valid(self):
 
-        testUserForm2 = UserRegisterForm({
+        testUserForm2 = UserRegisterForm(data = {
             'first_name ':'Arnold',
             'last_name ':'Schwarzenegger', 
             'username':'ArnoldSchwarzenegger',
-            'email ':'arnoldschwarzenegger@gmail.com',
+            'email':'arnoldschwarzenegger@gmail.com',
             'password1': '2@Mt,Aj~',
             'password2':'2@Mt,Aj~', 
             })
