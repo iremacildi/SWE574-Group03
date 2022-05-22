@@ -55,13 +55,20 @@ class PostListView(ListView):
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword))
-      
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword) & Q(category__icontains=cat))
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
@@ -119,6 +126,7 @@ class ServiceListView(ListView):
             keyword = ''
             cat='all'
             km='all'
+
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword),IsCancelled=False)
