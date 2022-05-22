@@ -6,7 +6,7 @@ from tracemalloc import start
 from unicodedata import category
 import django
 from django.forms.widgets import DateInput, TimeInput
-from django.http import JsonResponse
+from django.http import JsonResponse, QueryDict
 from django.http.response import Http404, HttpResponse
 
 import users
@@ -305,6 +305,9 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def about(request):
     return render(request, 'eventify/about.html', {'title': 'About'})
+@login_required    
+def manager(request):
+    return render(request, 'eventify/manager.html', {'title': 'manager'})
 
 class ServiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, OverRideDeleteView):
     model = Service
@@ -619,20 +622,37 @@ def pie_chart_category_active(request):
     #Filters for date
     q1 = ServiceChart.objects.values('start_date').last()
     q2 = ServiceChart.objects.values('end_date').last()
+    q3 = ServiceChart.objects.values('isLate').last()['isLate']
+    q4 = ServiceChart.objects.values('isGiven').last()['isGiven']
+    q5 = ServiceChart.objects.values('IsCancelled').last()['IsCancelled']
+    q6 = ServiceChart.objects.values('paid').last()['paid']
+    q7 = ServiceChart.objects.values('location').last()['location']
+    q8 = ServiceChart.objects.values('range').last()['range']
+ 
+   
+    filterlist =[]
     date1 = q1['start_date']
     date2 = q2['end_date']
 
     #Filters for attendee numbers
-    q3 = ServiceChart.objects.values('min_attendee').last()
-    q4 = ServiceChart.objects.values('max_attendee').last()
-    attendeeMin = q3['min_attendee']
-    attendeeMax = q4['max_attendee']
+    q9 = ServiceChart.objects.values('min_attendee').last()
+    q10 = ServiceChart.objects.values('max_attendee').last()
+    attendeeMin = q9['min_attendee']
+    attendeeMax = q10['max_attendee']
 
-    fieldname = 'category'
-    queryset = Service.objects.values(fieldname).filter(eventdate__range=[date1,date2]).filter(currentAtt__range=[attendeeMin,attendeeMax]).order_by(fieldname).annotate(the_count=Count(fieldname))
+    fieldname = 'date_posted'
+    prequery=Service.objects.all()
+    for item in prequery:
+        x=round(geodesic(item.location, q7).km,2)
+        if x<q8:
+            filterlist.append(item.location)
+    print(filterlist)
+    queryset = Service.objects.values(fieldname).filter(location__in=filterlist).filter(isLate=q3).filter(isGiven=q4).filter(IsCancelled=q5).filter(paid=q6).filter(eventdate__range=[date1,date2]).filter(currentAtt__range=[attendeeMin,attendeeMax]).order_by(fieldname).annotate(the_count=Count(fieldname))
     print(queryset)
+
+        
     for service_loop in queryset:
-        labels.append(service_loop['category'])
+        labels.append(service_loop[fieldname])
         data.append(service_loop['the_count'])
 
     return JsonResponse(data= {

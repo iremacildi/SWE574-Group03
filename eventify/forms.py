@@ -28,7 +28,7 @@ class ServiceForm(forms.ModelForm):
 class ServiceChartForm(forms.ModelForm):
     class Meta:
         model = ServiceChart
-        fields = ['start_date','end_date','min_attendee','max_attendee']
+        fields = ['start_date','end_date','min_attendee','max_attendee','paid','isLate','isGiven','IsCancelled','range','location']
 
         widgets = {
             'start_date':DateInput(attrs={'type': 'date'}),
