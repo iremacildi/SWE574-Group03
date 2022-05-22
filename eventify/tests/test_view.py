@@ -2,11 +2,13 @@
 from django.test import TestCase
 from django.urls import reverse
 from eventify.models import Service, Post, ServiceComment, Approved,RegisterEvent,RegisterService,Comment
+from eventify.views import ServiceDetailView,PostDetailView
 from eventify.forms import PostForm, ServiceForm
 from django.contrib.auth.models import User
 from datetime import datetime
 
 class AppliedEventsServicesViewTest(TestCase):
+    
     def test_only_applied_events_in_list(self):
         test_user1 = User.objects.create_user(username='testuser1', password='1X<ISRUkw+tuK')
         test_user2 = User.objects.create_user(username='testuser2', password='2HJ1vRV0Z&3iD')
@@ -60,3 +62,13 @@ class AppliedEventsServicesViewTest(TestCase):
         response = self.client.get(reverse('index'))
         self.assertEqual(str(response.context['user']), 'testuser2')
         self.assertEqual(response.status_code, 200)
+
+        # response = self.client.get(reverse('service_detail', args=['1']))
+        # self.assertEqual(str(response.context['address']), '41.0255493,28.9742571')
+        response_about = self.client.get(reverse('about'))
+        self.assertEqual(response_about.status_code, 200)
+        # self.assertTemplateUsed(response_about.status_code, 'eventify/about')
+
+
+        # response_register_event = self.client.get(reverse('post_detail', args=['1']))
+
