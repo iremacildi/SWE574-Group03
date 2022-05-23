@@ -16,6 +16,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import PostForm, ServiceForm
+from django.http import JsonResponse
 from django.views.generic import (
     CreateView,
     ListView,
@@ -93,7 +94,7 @@ class PostListView(ListView):
         else:
             return object_list
 
-class FeedView(ListView):
+class FeedView(LoginRequiredMixin,ListView):
     model = Action
     template_name = 'eventify/feed.html'
     context_object_name = 'stream'
