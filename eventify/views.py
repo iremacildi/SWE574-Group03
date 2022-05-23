@@ -1,12 +1,17 @@
 import datetime
+from itertools import count
+from multiprocessing import context
 from pyexpat import model
+from tracemalloc import start
+from unicodedata import category
 import django
 from django.forms.widgets import DateInput, TimeInput
+from django.http import JsonResponse, QueryDict
 from django.http.response import Http404, HttpResponse
 
 import users
 from eventify.ViewExtentions import OverRideDeleteView
-from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent,Approved
+from .models import  Post, Comment, RegisterService,Service, ServiceChart,ServiceComment,RegisterEvent,Approved
 from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -14,7 +19,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+
+from .forms import PostForm, ServiceChartForm, ServiceForm
+
 from .forms import PostForm, ServiceForm
+from django.http import JsonResponse
+
 from django.views.generic import (
     CreateView,
     ListView,
@@ -31,6 +41,16 @@ from datetime import date, timezone
 from datetime import timedelta
 from notifications.signals import notify
 from notifications.models import Notification
+import requests
+import operator
+import functools
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.db.models import Sum
+from django.http import JsonResponse
+
+from django.db.models import Count
 
 class PostListView(ListView):
     model = Post
@@ -52,13 +72,20 @@ class PostListView(ListView):
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword))
-      
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword) & Q(category__icontains=cat))
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
@@ -77,7 +104,7 @@ class PostListView(ListView):
         else:
             return object_list
 
-class FeedView(ListView):
+class FeedView(LoginRequiredMixin,ListView):
     model = Action
     template_name = 'eventify/feed.html'
     context_object_name = 'stream'
@@ -116,16 +143,24 @@ class ServiceListView(ListView):
             keyword = ''
             cat='all'
             km='all'
+
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword),IsCancelled=False)
-      
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat,IsCancelled=False)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword)) & Q(category__icontains=cat,IsCancelled=False,)
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.filter(IsCancelled=False)
@@ -143,6 +178,54 @@ class ServiceListView(ListView):
             return my_list
         else:
             return object_list
+
+def search(keyword):
+    result = []
+
+    url = 'https://query.wikidata.org/sparql'
+    query = '''
+    SELECT distinct ?itemLabel ?linkcount #?classLabel ?typeLabel
+    WHERE {
+      {
+        SELECT ?class ?searched_item
+        WHERE {
+          {
+            SELECT ?searched_item {
+              SERVICE wikibase:mwapi {
+                bd:serviceParam wikibase:api "EntitySearch".
+                bd:serviceParam wikibase:endpoint "www.wikidata.org".
+                bd:serviceParam mwapi:search "''' + keyword + '''".
+                bd:serviceParam mwapi:language "en".
+                ?searched_item wikibase:apiOutputItem mwapi:item.
+                ?num wikibase:apiOrdinal true.
+              }
+              SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
+            }
+            LIMIT 5
+          }
+          hint:Prior hint:runFirst true .
+          ?searched_item wdt:P279 ?class .
+          ?searched_item wdt:P31 ?type .
+          SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+        }
+      }
+      hint:Prior hint:runFirst true .
+      ?item wdt:P279 ?class .
+      ?item wdt:P31 ?type .
+      ?item wikibase:sitelinks ?linkcount .
+      FILTER(?linkcount > 50).
+      FILTER(?item != ?searched_item).
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    }
+    ORDER BY ASC(?class) ASC(?type) DESC(?linkcount)
+    '''
+    
+    r = requests.get(url, params = {'format': 'json', 'query': query})
+    data = r.json()
+    for r in data["results"]["bindings"]:
+        result.append(r["itemLabel"]["value"])
+
+    return result
 
 class UserListView(ListView):
     model = User
@@ -293,6 +376,9 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def about(request):
     return render(request, 'eventify/about.html', {'title': 'About'})
+@login_required    
+def manager(request):
+    return render(request, 'eventify/manager.html', {'title': 'manager'})
 
 class ServiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, OverRideDeleteView):
     model = Service
@@ -572,4 +658,88 @@ class FollowingView(ListView):
        
         return context
 
+class ChartData(APIView):
+    authentication_classes = []
+    permission_classes = []
+   
+    def get(self, request, format = None):
+        labels = [
+            'January',
+            'February', 
+            'March', 
+            'April', 
+            'May', 
+            'June', 
+            'July'
+            ]
+        chartLabel = "my data"
+        chartdata = [0, 10, 5, 2, 20, 30, 45]
+        data ={
+                     "labels":labels,
+                     "chartLabel":chartLabel,
+                     "chartdata":chartdata,
+             }
+        return render (request, 'eventify/index_chart.html', {})
 
+
+
+def pie_chart_category_active_render(request):
+     return render(request, 'eventify/index_chart_2.html')
+     
+def pie_chart_category_active(request):
+    labels = []
+    data = []
+
+    #Filters for date
+    q1 = ServiceChart.objects.values('start_date').last()
+    q2 = ServiceChart.objects.values('end_date').last()
+    q3 = ServiceChart.objects.values('isLate').last()['isLate']
+    q4 = ServiceChart.objects.values('isGiven').last()['isGiven']
+    q5 = ServiceChart.objects.values('IsCancelled').last()['IsCancelled']
+    q6 = ServiceChart.objects.values('paid').last()['paid']
+    q7 = ServiceChart.objects.values('location').last()['location']
+    q8 = ServiceChart.objects.values('range').last()['range']
+ 
+   
+    filterlist =[]
+    date1 = q1['start_date']
+    date2 = q2['end_date']
+
+    #Filters for attendee numbers
+    q9 = ServiceChart.objects.values('min_attendee').last()
+    q10 = ServiceChart.objects.values('max_attendee').last()
+    attendeeMin = q9['min_attendee']
+    attendeeMax = q10['max_attendee']
+
+    fieldname = 'created'
+    prequery=Service.objects.all()
+    for item in prequery:
+        x=round(geodesic(item.location, q7).km,2)
+        if x<q8:
+            filterlist.append(item.location)
+    print(filterlist)
+    queryset = Service.objects.values(fieldname).filter(location__in=filterlist).filter(isLate=q3).filter(isGiven=q4).filter(IsCancelled=q5).filter(paid=q6).filter(eventdate__range=[date1,date2]).filter(currentAtt__range=[attendeeMin,attendeeMax]).order_by(fieldname).annotate(the_count=Count(fieldname))
+    print(queryset)
+
+        
+    for service_loop in queryset:
+        labels.append(service_loop[fieldname])
+        data.append(service_loop['the_count'])
+
+    return JsonResponse(data= {
+        'labels': labels,
+        'data': data,
+    })
+
+def service_chart(request):
+    form = ServiceChartForm()
+
+    if request.method == 'POST':
+        form = ServiceChartForm(request.POST)
+        if form.is_valid():
+            selection = form.save(commit=False)
+            selection.save()
+            return redirect('api2')
+
+    context = {'form':form}
+    return render(request, 'eventify/service_chart.html', context)

@@ -107,8 +107,16 @@
           <div class="navbar-nav mr-auto">
             <a class="nav-item nav-link" href="{% url 'index' %}">Eventify</a>
             <a class="nav-item nav-link" href="{% url 'index' %}">Events</a>
+
             <a class="nav-item nav-link" href="{% url 'services' %}">Services</a>
+            {% if user.is_authenticated %}
             <a class="nav-item nav-link" href="{% url 'feed' %}">Feed</a>
+            {% endif %}
+            {% if user.is_authenticated %}
+            {% if user.profile.isEmployee is True %}
+            <a class="nav-item nav-link" href="{% url 'manager' %}">Manager</a>
+            {% endif %}
+            {% endif %}
             <!-- <a class="nav-item nav-link" >About</a> -->
           </div>
           <!-- Navbar Right Side -->
