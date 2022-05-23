@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 import users
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm,InterestsForm
+from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from eventify.models import Post, RegisterEvent, RegisterService,Service
 from .models import Profile
 from geopy.geocoders import Nominatim
@@ -29,18 +29,6 @@ def register(request):
     else:
         form = UserRegisterForm()
     return render(request, 'users/register.html', {'form': form})
-
-def interests(request):
-    if request.method == 'POST':
-        form = InterestsForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(
-                request, "We understand your interests. Now enjoy with Eventify!")
-            return redirect('login')
-    else:
-        form = InterestsForm()
-    return render(request, 'users/interests.html', {'form': form})        
 
 
 @login_required
