@@ -3,7 +3,28 @@ from django.contrib.auth.models import User
 from PIL import Image
 from location_field.models.plain import PlainLocationField
 from simple_history.models import HistoricalRecords
+from django.forms import CharField
 
+INTEREST_CHOICES = (
+        ('sport', 'Sport'),
+        ('art', 'Art'),
+        ('music', 'Music'),
+        ('cooking', 'Cooking'),
+        ('agriculture', 'Agriculture'),
+        ('handicraft', 'Handicraft'),
+        ('dance', 'Dance'),
+        ('music', 'Music'),
+        ('cinema', 'Cinema'),
+        ('fashion', 'Fashion'),
+)
+
+class InterestSelection(models.Model):
+    interest_1 = models.CharField(max_length=120, choices=INTEREST_CHOICES)
+    interest_2 = models.CharField(max_length=120, choices=INTEREST_CHOICES)
+    interest_3 = models.CharField(max_length=120, choices=INTEREST_CHOICES)
+
+    def save(self, *args, **kwargs):
+        super(InterestSelection, self).save(*args, **kwargs)
 
 class Profile(models.Model):
     history = HistoricalRecords()
