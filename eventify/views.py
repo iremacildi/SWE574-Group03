@@ -19,7 +19,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+
 from .forms import PostForm, ServiceChartForm, ServiceForm
+
+from .forms import PostForm, ServiceForm
+from django.http import JsonResponse
+
 from django.views.generic import (
     CreateView,
     ListView,
@@ -36,6 +41,9 @@ from datetime import date, timezone
 from datetime import timedelta
 from notifications.signals import notify
 from notifications.models import Notification
+import requests
+import operator
+import functools
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -64,13 +72,20 @@ class PostListView(ListView):
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword))
-      
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword) & Q(category__icontains=cat))
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
@@ -89,7 +104,7 @@ class PostListView(ListView):
         else:
             return object_list
 
-class FeedView(ListView):
+class FeedView(LoginRequiredMixin,ListView):
     model = Action
     template_name = 'eventify/feed.html'
     context_object_name = 'stream'
@@ -128,16 +143,24 @@ class ServiceListView(ListView):
             keyword = ''
             cat='all'
             km='all'
+
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword),IsCancelled=False)
-      
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat,IsCancelled=False)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword)) & Q(category__icontains=cat,IsCancelled=False,)
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.filter(IsCancelled=False)
@@ -155,6 +178,54 @@ class ServiceListView(ListView):
             return my_list
         else:
             return object_list
+
+def search(keyword):
+    result = []
+
+    url = 'https://query.wikidata.org/sparql'
+    query = '''
+    SELECT distinct ?itemLabel ?linkcount #?classLabel ?typeLabel
+    WHERE {
+      {
+        SELECT ?class ?searched_item
+        WHERE {
+          {
+            SELECT ?searched_item {
+              SERVICE wikibase:mwapi {
+                bd:serviceParam wikibase:api "EntitySearch".
+                bd:serviceParam wikibase:endpoint "www.wikidata.org".
+                bd:serviceParam mwapi:search "''' + keyword + '''".
+                bd:serviceParam mwapi:language "en".
+                ?searched_item wikibase:apiOutputItem mwapi:item.
+                ?num wikibase:apiOrdinal true.
+              }
+              SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
+            }
+            LIMIT 5
+          }
+          hint:Prior hint:runFirst true .
+          ?searched_item wdt:P279 ?class .
+          ?searched_item wdt:P31 ?type .
+          SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+        }
+      }
+      hint:Prior hint:runFirst true .
+      ?item wdt:P279 ?class .
+      ?item wdt:P31 ?type .
+      ?item wikibase:sitelinks ?linkcount .
+      FILTER(?linkcount > 50).
+      FILTER(?item != ?searched_item).
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+    }
+    ORDER BY ASC(?class) ASC(?type) DESC(?linkcount)
+    '''
+    
+    r = requests.get(url, params = {'format': 'json', 'query': query})
+    data = r.json()
+    for r in data["results"]["bindings"]:
+        result.append(r["itemLabel"]["value"])
+
+    return result
 
 class UserListView(ListView):
     model = User
