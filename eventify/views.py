@@ -2,6 +2,7 @@ import datetime
 from pyexpat import model
 import django
 from django.forms.widgets import DateInput, TimeInput
+from django.http import JsonResponse
 from django.http.response import Http404, HttpResponse
 
 import users
@@ -34,6 +35,11 @@ from notifications.models import Notification
 import requests
 import operator
 import functools
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.db.models import Sum
+from django.http import JsonResponse
 
 class PostListView(ListView):
     model = Post
@@ -638,4 +644,46 @@ class FollowingView(ListView):
        
         return context
 
+class ChartData(APIView):
+    authentication_classes = []
+    permission_classes = []
+   
+    def get(self, request, format = None):
+        labels = [
+            'January',
+            'February', 
+            'March', 
+            'April', 
+            'May', 
+            'June', 
+            'July'
+            ]
+        chartLabel = "my data"
+        chartdata = [0, 10, 5, 2, 20, 30, 45]
+        data ={
+                     "labels":labels,
+                     "chartLabel":chartLabel,
+                     "chartdata":chartdata,
+             }
+        return render (request, 'eventify/index_chart.html', {})
 
+
+
+def pie_chart_category_active_render(request):
+     return render(request, 'eventify/index_chart_2.html')
+     
+def pie_chart_category_active(request):
+    labels = []
+    data = []
+
+    #queryset = Service.objects.order_by('-currentAtt')[:5]
+    queryset = Service.objects.values('category').annotate(attendee_sum = Sum('currentAtt')).order_by('-attendee_sum')
+    print("I am here",queryset)
+    for service_loop in queryset:
+        labels.append(service_loop['category'])
+        data.append(service_loop['attendee_sum'])
+
+    return JsonResponse(data= {
+        'labels': labels,
+        'data': data,
+    })

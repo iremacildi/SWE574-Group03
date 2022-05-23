@@ -13,6 +13,8 @@ class Profile(models.Model):
     address=models.TextField(blank=True)
     credits=models.IntegerField(default=6)
     reserved=models.IntegerField(default=0)
+    interest=models.TextField(blank=True)
+    isEmployee = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.user.username} Profile'
