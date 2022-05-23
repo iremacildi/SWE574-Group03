@@ -30,9 +30,16 @@
               }]          
             },
             options: {
+                      scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
               responsive: true,
               legend: {
-                position: 'top',
+                position: 'bottom',
               },
               title: {
                 display: true,

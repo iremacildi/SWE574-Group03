@@ -640,7 +640,7 @@ def pie_chart_category_active(request):
     attendeeMin = q9['min_attendee']
     attendeeMax = q10['max_attendee']
 
-    fieldname = 'date_posted'
+    fieldname = 'created'
     prequery=Service.objects.all()
     for item in prequery:
         x=round(geodesic(item.location, q7).km,2)
