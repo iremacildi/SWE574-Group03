@@ -16,7 +16,6 @@ urlpatterns = [
     # Authentication Urls
     path('register/', user_views.register, name='register'),
     path('profile/', user_views.profile, name='profile'),
-    path('interests/', user_views.interests, name='interests'),
     path('profile', user_views.approve_service_register, name='approve_service_register'),
     # path('profile', user_views.delete_service_register, name='delete_service_register'),
  
