@@ -35,10 +35,11 @@ class Post(models.Model):
     eventdate = models.DateField(default=timezone.now)
     eventtime=models.TimeField()
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar')
-    duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)])
-    capacity=models.IntegerField(default=1,validators=[MaxValueValidator(100), MinValueValidator(1)])
+    duration=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(6), MinValueValidator(1)])
+    capacity=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(100), MinValueValidator(1)])
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
+    created=models.DateField(default=timezone.now)
     paid= models.BooleanField(default=False)
     IsCancelled= models.BooleanField(default=False)
     isLate=BooleanField(default=False)
@@ -61,11 +62,12 @@ class Service(models.Model):
     eventdate = models.DateField(default=timezone.now)
     tempLocation = models.TextField(blank=True)
     eventtime=models.TimeField()
-    duration=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)])
+    duration=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(6), MinValueValidator(1)])
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar') 
-    capacity=models.IntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)])
+    capacity=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)])
     location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
     content = models.TextField()
+    created=models.DateField(default=timezone.now)
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
@@ -170,6 +172,21 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.author
+
+
+class ServiceChart(models.Model):
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField(default=timezone.now)
+    min_attendee=models.IntegerField(default=0)
+    max_attendee=models.IntegerField(default=0)
+    paid= models.BooleanField(default=False)
+    isLate=BooleanField(default=False)
+    isGiven=BooleanField(default=False)
+    IsCancelled= models.BooleanField(default=False)
+    location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
+    range=models.IntegerField(default=1)
+
+
         
 # class Friend(models.Model):
 #     users = models.ManyToManyField(User)
