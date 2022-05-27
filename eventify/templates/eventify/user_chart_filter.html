@@ -3,7 +3,7 @@
 {% block content %}
 
   <div id="container" style="width: 75%;">
-    <canvas id="api2" data-url="{% url 'api3' %}"></canvas>
+    <canvas id="api3" data-url="{% url 'user_chart_data' %}"></canvas>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -12,7 +12,7 @@
 
     $(function () {
 
-      var $pieChart= $("#api2");
+      var $pieChart= $("#api3");
       $.ajax({
         url: $pieChart.data("url"),
         success: function (data) {
@@ -24,7 +24,7 @@
             data: {
               labels: data.labels,
               datasets: [{
-                label: 'Services',
+                label: 'Users',
                 backgroundColor: 'blue',
                 data: data.data
               }]          
@@ -43,7 +43,7 @@
               },
               title: {
                 display: true,
-                text: 'Services'
+                text: 'Users'
               }
             
             }

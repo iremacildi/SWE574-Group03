@@ -1,7 +1,11 @@
 from django import forms
 from django.forms.widgets import DateInput, TimeInput
+from users.models import User
+from location_field.models.plain import PlainLocationField
 
-from .models import Post,Service, ServiceChart
+import users
+
+from .models import Post,Service, ServiceChart, UserChart
 
 
 class PostForm(forms.ModelForm):
@@ -39,3 +43,22 @@ class ServiceChartForm(forms.ModelForm):
             'start_date':DateInput(attrs={'type': 'date'}),
             'end_date':DateInput(attrs={'type': 'date'}),
         }
+class EventChartForm(forms.ModelForm):
+    class Meta:
+        model = ServiceChart
+        fields = ['start_date','end_date','isLate','IsCancelled','range','location']
+
+        widgets = {
+            'start_date':DateInput(attrs={'type': 'date'}),
+            'end_date':DateInput(attrs={'type': 'date'}),
+        }        
+class UserChartForm(forms.ModelForm):
+    class Meta:
+        model=UserChart
+        fields = ['start_date','end_date','is_active','range','credits','location']
+       
+        widgets = {
+            'start_date':DateInput(attrs={'type': 'date'}),
+            'end_date':DateInput(attrs={'type': 'date'}),
+
+        }                

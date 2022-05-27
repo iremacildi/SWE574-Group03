@@ -186,6 +186,14 @@ class ServiceChart(models.Model):
     location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
     range=models.IntegerField(default=1)
 
+class UserChart(models.Model):
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField(default=timezone.now)
+    paid= models.BooleanField(default=False)
+    is_active=BooleanField(default=False)
+    credits=models.IntegerField(default=1)
+    location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
+    range=models.IntegerField(default=1)
 
         
 # class Friend(models.Model):
