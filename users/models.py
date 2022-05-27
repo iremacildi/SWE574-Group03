@@ -4,6 +4,7 @@ from PIL import Image
 from location_field.models.plain import PlainLocationField
 from simple_history.models import HistoricalRecords
 from django.forms import CharField
+from django.utils import timezone
 
 INTEREST_CHOICES = (
         ('sport', 'Sport'),
@@ -36,6 +37,8 @@ class Profile(models.Model):
     reserved=models.IntegerField(default=0)
     interest=models.TextField(blank=True)
     isEmployee = models.BooleanField(default=False)
+    created=models.DateField(default=timezone.now)
+    range=models.IntegerField(default=1)
 
     def __str__(self):
         return f'{self.user.username} Profile'

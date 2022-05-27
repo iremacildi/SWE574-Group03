@@ -22,6 +22,7 @@ from .views import (
     # UserServiceListView,
     add_comment,
     add_servicecomment,
+    event_chart,
     # follower_list_view,
     # following_list_view,
     register_event,
@@ -30,7 +31,8 @@ from .views import (
     unregister_service,
     unregister_event,
     approved,
-    pie_chart_category_active
+    service_chart_data
+  
 )
 
 
@@ -75,8 +77,16 @@ urlpatterns = [
 
     # charts
     path('api', views.ChartData.as_view(), name='api'),
-    path('api2', views.pie_chart_category_active_render, name='api2'),
-    path('api3', views.pie_chart_category_active, name='api3'),
-    path('service_chart', views.service_chart, name='service_chart')
+    path('service_chart_filter', views.service_chart_filter, name='service_chart_filter'),
+
+    path('service_chart_data', views.service_chart_data, name='service_chart_data'),
+
+    path('service_chart', views.service_chart, name='service_chart'),
+    path('event_chart_filter', views.event_chart_filter, name='event_chart_filter'),
+    path('event_chart_data', views.event_chart_data, name='event_chart_data'),
+    path('event_chart', views.event_chart, name='event_chart'),
+    path('user_chart', views.user_chart, name='user_chart'),
+    path('user_chart_filter', views.user_chart_filter, name='user_chart_filter'),
+    path('user_chart_data', views.user_chart_data, name='user_chart_data'),
 
 ]

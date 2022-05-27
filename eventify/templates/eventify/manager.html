@@ -1,7 +1,21 @@
 {% extends "eventify/base.html" %}
 {% block content %}
-    <h1>Admin Page</h1>
-    <div></div>
-    <a style="width:24%; background: #16c41e;" href="{% url 'service_chart' %}" class="btn btn-primary">Services</a>
+    <h3 style="text-align: center;">Admin Page</h3>
+    <div class="3-rows">
+
+        <div style="margin-bottom: 20px;margin-top:40px ;">
+            <a style="width:24%; background: #16c41e;" href="{% url 'service_chart' %}" class="btn btn-primary">Services</a>
+        </div>
+    
+        <div style="margin-bottom: 20px;">
+            <a style="width:24%; background: #16c41e;" href="{% url 'event_chart' %}" class="btn btn-primary">Events</a>
+
+        </div>
+        <div style="margin-bottom: 20px;">
+            <a style="width:24%; background: #16c41e;" href="{% url 'user_chart' %}" class="btn btn-primary">Users</a>
   
+        </div>
+    
+    </div>
+    
 {% endblock content %}
