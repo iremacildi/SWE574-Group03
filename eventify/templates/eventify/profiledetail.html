@@ -13,13 +13,14 @@
             <a href="{% url 'following_list' object.username %}"> Following</a>
 
             
-            <form method="POST" action="{% url 'follow_unfollow_user' object.username %}">
+            <form method="POST" action="{% url 'follow_unfollow_user' object.username False object.username %}">
                 {% csrf_token %}
                 <div class="form-group">
                     <input type="hidden" name="user_id" value="{{user.id}}">
                 </div>
                 {% if request.user|is_following:object %}
-                <button class="btn btn-primary" name="unfollow" value="{{object.username}}" type="submit">Unfollow</button>
+                <button class="btn btn-danger" name="unfollow" value="{{object.username}}" type="submit">Unfollow</button>
+                
                 {% else %}
                 <button class="btn btn-primary" name="follow" value="{{object.username}}" type="submit">Follow</button>
                 {% endif %}
