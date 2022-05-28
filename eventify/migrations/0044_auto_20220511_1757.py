@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('eventify', '0043_historicalcomment_historicalpost_historicalservice_historicalservicecomment'),
+        
     ]
 
     operations = [
