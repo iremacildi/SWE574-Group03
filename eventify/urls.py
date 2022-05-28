@@ -70,7 +70,7 @@ urlpatterns = [
     path('user/<str:username>/', UserListView.as_view(), name='profiledetail'),
     path('about/', views.about, name='about'),
     path('manager/', views.manager, name='manager'),
-    path('user/<str:username>/follow-unfollow/', follow_unfollow_user, name='follow_unfollow_user'),
+    path('user/<str:username>/<str:abc>/<str:activeuser>/follow-unfollow/', follow_unfollow_user, name='follow_unfollow_user'),
     path('feed', FeedView.as_view(), name='feed'),
     path('activity/', include('actstream.urls')),
     url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),

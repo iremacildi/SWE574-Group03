@@ -516,13 +516,17 @@ def unregister_event(request, pk):
         return redirect('post_detail', pk=pk)
 
 @login_required
-def follow_unfollow_user(request, username):
+def follow_unfollow_user(request, username, abc, activeuser):
     other_user = get_object_or_404(User, username=username)
     if request.method == 'POST': 
         if 'unfollow' in request.POST:
             unfollow(request.user, other_user)
         elif 'follow' in request.POST:
             follow(request.user, other_user, actor_only=False)
+
+        if abc == 'True':
+            return redirect('followers_list', username=activeuser)
+            
         return redirect('profiledetail', username=username)
     else:
         return redirect('profiledetail', username=username)
@@ -558,6 +562,11 @@ def register_service(request, pk):
                 user.save()
                 action.send(request.user, verb="sent registration request", target=service)
                 messages.success(request, "Registration request sent successfully")
+
+                sender = request.user
+                receiver = service.author
+                notify.send(sender, recipient=receiver, verb='service is applied by', target=service)
+
                 return redirect('service_detail', pk=pk) 
        
     else:

@@ -33,7 +33,7 @@ class Post(models.Model):
     content = models.TextField()
     tempLocation = models.TextField(blank=True)
     eventdate = models.DateField(default=timezone.now)
-    eventtime=models.TimeField()
+    eventtime=models.TimeField(default=timezone.now)
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar')
     duration=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(6), MinValueValidator(1)])
     capacity=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(100), MinValueValidator(1)])

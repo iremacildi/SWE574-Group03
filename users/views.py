@@ -27,7 +27,7 @@ def register(request):
             xyz = User.objects.get(username = username)
             print (xyz.id)
             messages.success(
-                request, "Your account has been created! Your are now able to login.")
+                request, "Your account has been created! You are now able to login.")
             return redirect('interests',user_id=xyz.id)
     else:
         form = UserRegisterForm()

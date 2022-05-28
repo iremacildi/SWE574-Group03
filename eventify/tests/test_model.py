@@ -1,8 +1,11 @@
+from ctypes import addressof
 from datetime import datetime
+from email.policy import default
 from django.test import TestCase
 
 from django.contrib.auth.models import User
 from eventify.models import Service, Post, ServiceComment, Approved,RegisterEvent,RegisterService,Comment
+from users.models import Profile
 
 class ModelTest(TestCase):              
     @classmethod
@@ -108,7 +111,6 @@ class ModelTest(TestCase):
         self.assertEqual(approvedTestObject.author, self.userTestObject1)
         self.assertEqual(approvedTestObject.isOk, 'False')
 
-    
     def testRegisterEvent(self):
         registerEventTestObject = RegisterEvent(
             post = self.EventSetUpTestObject,
@@ -121,7 +123,6 @@ class ModelTest(TestCase):
         self.assertEqual(registerEventTestObject.author, self.userTestObject1)
         self.assertEqual(registerEventTestObject.title, 'Test Event Title - 4')
     
-
     def testRegisterService(self):
         registerServiceTestObject = RegisterService(
             service = self.ServiceSetUpTestObject,
@@ -136,8 +137,7 @@ class ModelTest(TestCase):
         self.assertEqual(registerServiceTestObject.approved_register, 'True')
         self.assertEqual(registerServiceTestObject.title, 'Test Event Title - 4')
 
-
-    def Comment(self):
+    def testComment(self):
         commentTestObject = Comment(
             post = self.EventSetUpTestObject,
             author = self.userTestObject1, 
@@ -146,4 +146,25 @@ class ModelTest(TestCase):
             approved_comment= 'True',
         )
         self.assertEqual(commentTestObject.author, self.userTestObject1)
-        self.assertEqual(commentTestObject.isOk, 'False')
+        self.assertEqual(commentTestObject.approved_comment, 'True')
+
+    def testProfile(self):
+        profileTestObject = Profile(
+            # history ='',
+            user = self.userTestObject1,
+            location = default,
+            address = '',
+            credits = '6',
+            reserved = ''
+        )
+        self.assertEqual(profileTestObject.address, '')
+
+# @receiver(post_save, sender=User)
+# def create_profile(sender, instance, created, **kwargs):
+#     if created:
+#         Profile.objects.create(user=instance)
+
+
+# @receiver(post_save, sender=User)
+# def save_profile(sender, instance, **kwargs):
+#     instance.profile.save()
