@@ -7,7 +7,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('eventify', '0050_auto_20220523_1933'),
-        ('eventify', '0044_auto_20220519_2311'),
     ]
 
     operations = [
