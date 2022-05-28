@@ -11,10 +11,25 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('users', '0003_remove_profile_followers'),
+        ('users', '0001_initial'),
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='InterestSelection',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('interest_1', models.CharField(choices=[('sport', 'Sport'), ('art', 'Art'), ('music', 'Music'), ('cooking', 'Cooking'), ('agriculture', 'Agriculture'), ('handicraft', 'Handicraft'), ('dance', 'Dance'), ('music', 'Music'), ('cinema', 'Cinema'), ('fashion', 'Fashion')], max_length=120)),
+                ('interest_2', models.CharField(choices=[('sport', 'Sport'), ('art', 'Art'), ('music', 'Music'), ('cooking', 'Cooking'), ('agriculture', 'Agriculture'), ('handicraft', 'Handicraft'), ('dance', 'Dance'), ('music', 'Music'), ('cinema', 'Cinema'), ('fashion', 'Fashion')], max_length=120)),
+                ('interest_3', models.CharField(choices=[('sport', 'Sport'), ('art', 'Art'), ('music', 'Music'), ('cooking', 'Cooking'), ('agriculture', 'Agriculture'), ('handicraft', 'Handicraft'), ('dance', 'Dance'), ('music', 'Music'), ('cinema', 'Cinema'), ('fashion', 'Fashion')], max_length=120)),
+            ],
+        ),
+
+        migrations.AddField(
+            model_name='profile',
+            name='isEmployee',
+            field=models.BooleanField(default=False),
+        ),
         migrations.CreateModel(
             name='HistoricalProfile',
             fields=[
@@ -24,6 +39,8 @@ class Migration(migrations.Migration):
                 ('address', models.TextField(blank=True)),
                 ('credits', models.IntegerField(default=6)),
                 ('reserved', models.IntegerField(default=0)),
+                ('interest', models.TextField(blank=True)),
+                ('isEmployee', models.BooleanField(default=False)),
                 ('history_id', models.AutoField(primary_key=True, serialize=False)),
                 ('history_date', models.DateTimeField(db_index=True)),
                 ('history_change_reason', models.CharField(max_length=100, null=True)),

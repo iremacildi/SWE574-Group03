@@ -8,9 +8,15 @@
         <div class="media-body">
             <p class="account-heading">{{ user.first_name}} {{ user.last_name}}</p>
             <p class="text-secondary">Username: {{ user.username }}</p>
-            <p class="text-secondary">Email: {{user.email }}</p>
+            <p class="text-secondary">Email: {{ user.email }}</p>
             <p class="text-secondary">Credits: {{credits }}</p>
             <p class="text-secondary">Address: {{address}}</p>
+            {% if user.profile.interest %}
+                <p class="text-secondary">Interests: {{user.profile.interest}}</p>
+            {% else %}
+                <p class="text-secondary">Interests: You have not chosen an interest topic yet. Choose it in Update profile</p>
+            {% endif %}
+
             <a href="{% url 'followers_list' user.username %}"> Followers</a>
             <a href="{% url 'following_list' user.username %}"> Following</a>
 

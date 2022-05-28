@@ -1,12 +1,17 @@
 import datetime
+from itertools import count
+from multiprocessing import context
 from pyexpat import model
+from tracemalloc import start
+from unicodedata import category
 import django
 from django.forms.widgets import DateInput, TimeInput
+from django.http import JsonResponse, QueryDict
 from django.http.response import Http404, HttpResponse
 
 import users
 from eventify.ViewExtentions import OverRideDeleteView
-from .models import  Post, Comment, RegisterService,Service,ServiceComment,RegisterEvent,Approved
+from .models import  Post, Comment, RegisterService,Service, ServiceChart,ServiceComment,RegisterEvent,Approved, UserChart
 from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -14,7 +19,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+
+from .forms import EventChartForm, PostForm, ServiceChartForm, ServiceForm,EventChartForm, UserChartForm
+
 from .forms import PostForm, ServiceForm
+from django.http import JsonResponse
+
 from django.views.generic import (
     CreateView,
     ListView,
@@ -34,6 +44,13 @@ from notifications.models import Notification
 import requests
 import operator
 import functools
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.db.models import Sum
+from django.http import JsonResponse
+
+from django.db.models import Count
 
 class PostListView(ListView):
     model = Post
@@ -55,13 +72,20 @@ class PostListView(ListView):
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword))
-      
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword) & Q(category__icontains=cat))
+            wiki_items = search(keyword)
+            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+            object_list2 = self.model.objects.filter(condition)
+            object_list=object_list|object_list2
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
@@ -80,7 +104,7 @@ class PostListView(ListView):
         else:
             return object_list
 
-class FeedView(ListView):
+class FeedView(LoginRequiredMixin,ListView):
     model = Action
     template_name = 'eventify/feed.html'
     context_object_name = 'stream'
@@ -119,6 +143,7 @@ class ServiceListView(ListView):
             keyword = ''
             cat='all'
             km='all'
+
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword),IsCancelled=False)
@@ -351,6 +376,9 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def about(request):
     return render(request, 'eventify/about.html', {'title': 'About'})
+@login_required    
+def manager(request):
+    return render(request, 'eventify/manager.html', {'title': 'manager'})
 
 class ServiceDeleteView(LoginRequiredMixin, UserPassesTestMixin, OverRideDeleteView):
     model = Service
@@ -634,4 +662,193 @@ class FollowingView(ListView):
        
         return context
 
+class ChartData(APIView):
+    authentication_classes = []
+    permission_classes = []
+   
+    def get(self, request, format = None):
+        labels = [
+            'January',
+            'February', 
+            'March', 
+            'April', 
+            'May', 
+            'June', 
+            'July'
+            ]
+        chartLabel = "my data"
+        chartdata = [0, 10, 5, 2, 20, 30, 45]
+        data ={
+                     "labels":labels,
+                     "chartLabel":chartLabel,
+                     "chartdata":chartdata,
+             }
+        return render (request, 'eventify/index_chart.html', {})
 
+
+
+def service_chart_filter(request):
+     return render(request, 'eventify/service_chart_filter.html')
+
+def event_chart_filter(request):
+     return render(request, 'eventify/event_chart_filter.html')
+def user_chart_filter(request):
+     return render(request, 'eventify/user_chart_filter.html')     
+def service_chart_data(request):
+    labels = []
+    data = []
+
+    #Filters for date
+    q1 = ServiceChart.objects.values('start_date').last()
+    q2 = ServiceChart.objects.values('end_date').last()
+    q3 = ServiceChart.objects.values('isLate').last()['isLate']
+    q4 = ServiceChart.objects.values('isGiven').last()['isGiven']
+    q5 = ServiceChart.objects.values('IsCancelled').last()['IsCancelled']
+    q6 = ServiceChart.objects.values('paid').last()['paid']
+    q7 = ServiceChart.objects.values('location').last()['location']
+    q8 = ServiceChart.objects.values('range').last()['range']
+ 
+   
+    filterlist =[]
+    date1 = q1['start_date']
+    date2 = q2['end_date']
+
+    #Filters for attendee numbers
+    q9 = ServiceChart.objects.values('min_attendee').last()
+    q10 = ServiceChart.objects.values('max_attendee').last()
+    attendeeMin = q9['min_attendee']
+    attendeeMax = q10['max_attendee']
+
+    fieldname = 'created'
+    prequery=Service.objects.all()
+    for item in prequery:
+        x=round(geodesic(item.location, q7).km,2)
+        if x<q8:
+            filterlist.append(item.location)
+    print(filterlist)
+    queryset = Service.objects.values(fieldname).filter(location__in=filterlist).filter(isLate=q3).filter(isGiven=q4).filter(IsCancelled=q5).filter(paid=q6).filter(eventdate__range=[date1,date2]).filter(currentAtt__range=[attendeeMin,attendeeMax]).order_by(fieldname).annotate(the_count=Count(fieldname))
+    print(queryset)
+
+        
+    for service_loop in queryset:
+        labels.append(service_loop[fieldname])
+        data.append(service_loop['the_count'])
+
+    return JsonResponse(data= {
+        'labels': labels,
+        'data': data,
+    })
+def event_chart_data(request):
+    labels = []
+    data = []
+
+    #Filters for date
+    q1 = ServiceChart.objects.values('start_date').last()
+    q2 = ServiceChart.objects.values('end_date').last()
+    q3 = ServiceChart.objects.values('isLate').last()['isLate']
+    q5 = ServiceChart.objects.values('IsCancelled').last()['IsCancelled']
+    q7 = ServiceChart.objects.values('location').last()['location']
+    q8 = ServiceChart.objects.values('range').last()['range']
+ 
+   
+    filterlist =[]
+    date1 = q1['start_date']
+    date2 = q2['end_date']
+
+    fieldname = 'created'
+    prequery=Post.objects.all()
+    for item in prequery:
+        x=round(geodesic(item.location, q7).km,2)
+        if x<q8:
+            filterlist.append(item.location)
+    print(filterlist)
+    queryset = Post.objects.values(fieldname).filter(location__in=filterlist).filter(isLate=q3).filter(IsCancelled=q5).filter(eventdate__range=[date1,date2]).order_by(fieldname).annotate(the_count=Count(fieldname))
+    print(queryset)
+
+        
+    for service_loop in queryset:
+        labels.append(service_loop[fieldname])
+        data.append(service_loop['the_count'])
+
+    return JsonResponse(data= {
+        'labels': labels,
+        'data': data,
+    })
+
+def user_chart_data(request):
+    labels = []
+    data = []
+
+    #Filters for date
+    q1 = UserChart.objects.values('start_date').last()
+    q2 = UserChart.objects.values('end_date').last()
+    q3 = UserChart.objects.values('is_active').last()['is_active']
+    q5 = UserChart.objects.values('credits').last()['credits']
+    q7 = UserChart.objects.values('location').last()['location']
+    q8 = UserChart.objects.values('range').last()['range']
+ 
+   
+    filterlist =[]
+    date1 = q1['start_date']
+    date2 = q2['end_date']
+
+    fieldname = 'created'
+    prequery=Profile.objects.all()
+    for item in prequery:
+        x=round(geodesic(item.location, q7).km,2)
+        if x<q8:
+            filterlist.append(item.location)
+    print(filterlist)
+    queryset = Profile.objects.values(fieldname).filter(location__in=filterlist).filter(created__range=[date1,date2]).order_by(fieldname).annotate(the_count=Count(fieldname))
+    print(queryset)
+
+        
+    for service_loop in queryset:
+        labels.append(service_loop[fieldname])
+        data.append(service_loop['the_count'])
+
+    return JsonResponse(data= {
+        'labels': labels,
+        'data': data,
+    })
+
+
+def service_chart(request):
+    form = ServiceChartForm()
+
+    if request.method == 'POST':
+        form = ServiceChartForm(request.POST)
+        if form.is_valid():
+            selection = form.save(commit=False)
+            selection.save()
+            return redirect('service_chart_filter')
+
+    context = {'form':form}
+    return render(request, 'eventify/service_chart.html', context)
+
+def event_chart(request):
+    form = EventChartForm()
+
+    if request.method == 'POST':
+        form = EventChartForm(request.POST)
+        if form.is_valid():
+            selection = form.save(commit=False)
+            selection.save()
+            return redirect('event_chart_filter')
+
+    context = {'form':form}
+    return render(request, 'eventify/event_chart.html', context)
+
+def user_chart(request):
+    form = UserChartForm()
+
+    if request.method == 'POST':
+        form = UserChartForm(request.POST)
+        if form.is_valid():
+            selection = form.save(commit=False)
+            selection.save()
+            return redirect('user_chart_filter')
+
+    context = {'form':form}
+    return render(request, 'eventify/user_chart.html', context)
+    

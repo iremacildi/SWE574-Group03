@@ -42,6 +42,7 @@ urlpatterns = [
     path('ratings/', include('star_ratings.urls', namespace='ratings')),    
     path('user/<str:username>/followers_list', FollowersView.as_view(), name='followers_list'),
     path('user/<str:username>/following_list', FollowingView.as_view(), name='following_list'),
+    path('interests/<int:user_id>', user_views.interests, name='interests'),
 
 ]
 

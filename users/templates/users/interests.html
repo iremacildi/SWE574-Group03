@@ -1,0 +1,15 @@
+{% extends "eventify/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <form action="" method="POST">
+                <legend class="border-bottom mb-4">Please select your interests</legend>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-outline-info" type="submit">Save</button>
+            </div>
+        </form>
+
+    </div>
+
+    {% endblock content %}
