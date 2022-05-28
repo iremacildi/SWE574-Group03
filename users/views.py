@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 import users
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm,InterestsForm
 from eventify.models import Post, RegisterEvent, RegisterService,Service
-from .models import Profile
+from .models import InterestSelection, Profile
 from geopy.geocoders import Nominatim
 from django.views.generic import (
     CreateView,
@@ -15,6 +15,7 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
+from django.contrib.auth.models import User
 
 
 def register(request):
@@ -23,17 +24,22 @@ def register(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
+            xyz = User.objects.get(username = username)
+            print (xyz.id)
             messages.success(
-                request, "Your account has been created! Your are now able to login.")
-            return redirect('interests')
+                request, "Your account has been created! You are now able to login.")
+            return redirect('interests',user_id=xyz.id)
     else:
         form = UserRegisterForm()
     return render(request, 'users/register.html', {'form': form})
 
-def interests(request):
+def interests(request, user_id):
+    print(request)
     if request.method == 'POST':
         form = InterestsForm(request.POST)
         if form.is_valid():
+            profile = Profile.objects.get(user_id=user_id)
+            form.instance.user = profile.user
             form.save()
             messages.success(
                 request, "We understand your interests. Now enjoy with Eventify!")
@@ -83,24 +89,31 @@ def profile(request):
 
 @login_required
 def editprofile(request):
+    interest_object = InterestSelection.objects.get(user_id = request.user.id)
+    print (interest_object)
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
-        p_form = ProfileUpdateForm(
-            request.POST, request.FILES, instance=request.user.profile)
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        r_form = InterestsForm(request.POST, instance=interest_object)    
 
-        if u_form.is_valid() and p_form.is_valid():
+        if u_form.is_valid() and p_form.is_valid() and r_form.is_valid():
             u_form.save()
             p_form.save()
+            r_form.save()    
             messages.success(request, "Your account has been updated!")
             return redirect('profile')
 
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
+        r_form = InterestsForm(instance=request.user)
+
 
     context = {
         'u_form': u_form,
-        'p_form': p_form
+        'p_form': p_form,
+        'r_form': r_form
+
     }
     return render(request, 'users/editprofile.html', context)
     

@@ -11,7 +11,7 @@ from django.http.response import Http404, HttpResponse
 
 import users
 from eventify.ViewExtentions import OverRideDeleteView
-from .models import  Post, Comment, RegisterService,Service, ServiceChart,ServiceComment,RegisterEvent,Approved
+from .models import  Post, Comment, RegisterService,Service, ServiceChart,ServiceComment,RegisterEvent,Approved, UserChart
 from users.models import Profile
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -20,7 +20,7 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from .forms import PostForm, ServiceChartForm, ServiceForm
+from .forms import EventChartForm, PostForm, ServiceChartForm, ServiceForm,EventChartForm, UserChartForm
 
 from .forms import PostForm, ServiceForm
 from django.http import JsonResponse
@@ -516,13 +516,17 @@ def unregister_event(request, pk):
         return redirect('post_detail', pk=pk)
 
 @login_required
-def follow_unfollow_user(request, username):
+def follow_unfollow_user(request, username, abc, activeuser):
     other_user = get_object_or_404(User, username=username)
     if request.method == 'POST': 
         if 'unfollow' in request.POST:
             unfollow(request.user, other_user)
         elif 'follow' in request.POST:
             follow(request.user, other_user, actor_only=False)
+
+        if abc == 'True':
+            return redirect('followers_list', username=activeuser)
+            
         return redirect('profiledetail', username=username)
     else:
         return redirect('profiledetail', username=username)
@@ -558,6 +562,11 @@ def register_service(request, pk):
                 user.save()
                 action.send(request.user, verb="sent registration request", target=service)
                 messages.success(request, "Registration request sent successfully")
+
+                sender = request.user
+                receiver = service.author
+                notify.send(sender, recipient=receiver, verb='service is applied by', target=service)
+
                 return redirect('service_detail', pk=pk) 
        
     else:
@@ -683,10 +692,14 @@ class ChartData(APIView):
 
 
 
-def pie_chart_category_active_render(request):
-     return render(request, 'eventify/index_chart_2.html')
-     
-def pie_chart_category_active(request):
+def service_chart_filter(request):
+     return render(request, 'eventify/service_chart_filter.html')
+
+def event_chart_filter(request):
+     return render(request, 'eventify/event_chart_filter.html')
+def user_chart_filter(request):
+     return render(request, 'eventify/user_chart_filter.html')     
+def service_chart_data(request):
     labels = []
     data = []
 
@@ -730,6 +743,80 @@ def pie_chart_category_active(request):
         'labels': labels,
         'data': data,
     })
+def event_chart_data(request):
+    labels = []
+    data = []
+
+    #Filters for date
+    q1 = ServiceChart.objects.values('start_date').last()
+    q2 = ServiceChart.objects.values('end_date').last()
+    q3 = ServiceChart.objects.values('isLate').last()['isLate']
+    q5 = ServiceChart.objects.values('IsCancelled').last()['IsCancelled']
+    q7 = ServiceChart.objects.values('location').last()['location']
+    q8 = ServiceChart.objects.values('range').last()['range']
+ 
+   
+    filterlist =[]
+    date1 = q1['start_date']
+    date2 = q2['end_date']
+
+    fieldname = 'created'
+    prequery=Post.objects.all()
+    for item in prequery:
+        x=round(geodesic(item.location, q7).km,2)
+        if x<q8:
+            filterlist.append(item.location)
+    print(filterlist)
+    queryset = Post.objects.values(fieldname).filter(location__in=filterlist).filter(isLate=q3).filter(IsCancelled=q5).filter(eventdate__range=[date1,date2]).order_by(fieldname).annotate(the_count=Count(fieldname))
+    print(queryset)
+
+        
+    for service_loop in queryset:
+        labels.append(service_loop[fieldname])
+        data.append(service_loop['the_count'])
+
+    return JsonResponse(data= {
+        'labels': labels,
+        'data': data,
+    })
+
+def user_chart_data(request):
+    labels = []
+    data = []
+
+    #Filters for date
+    q1 = UserChart.objects.values('start_date').last()
+    q2 = UserChart.objects.values('end_date').last()
+    q3 = UserChart.objects.values('is_active').last()['is_active']
+    q5 = UserChart.objects.values('credits').last()['credits']
+    q7 = UserChart.objects.values('location').last()['location']
+    q8 = UserChart.objects.values('range').last()['range']
+ 
+   
+    filterlist =[]
+    date1 = q1['start_date']
+    date2 = q2['end_date']
+
+    fieldname = 'created'
+    prequery=Profile.objects.all()
+    for item in prequery:
+        x=round(geodesic(item.location, q7).km,2)
+        if x<q8:
+            filterlist.append(item.location)
+    print(filterlist)
+    queryset = Profile.objects.values(fieldname).filter(location__in=filterlist).filter(created__range=[date1,date2]).order_by(fieldname).annotate(the_count=Count(fieldname))
+    print(queryset)
+
+        
+    for service_loop in queryset:
+        labels.append(service_loop[fieldname])
+        data.append(service_loop['the_count'])
+
+    return JsonResponse(data= {
+        'labels': labels,
+        'data': data,
+    })
+
 
 def service_chart(request):
     form = ServiceChartForm()
@@ -739,7 +826,34 @@ def service_chart(request):
         if form.is_valid():
             selection = form.save(commit=False)
             selection.save()
-            return redirect('api2')
+            return redirect('service_chart_filter')
 
     context = {'form':form}
     return render(request, 'eventify/service_chart.html', context)
+
+def event_chart(request):
+    form = EventChartForm()
+
+    if request.method == 'POST':
+        form = EventChartForm(request.POST)
+        if form.is_valid():
+            selection = form.save(commit=False)
+            selection.save()
+            return redirect('event_chart_filter')
+
+    context = {'form':form}
+    return render(request, 'eventify/event_chart.html', context)
+
+def user_chart(request):
+    form = UserChartForm()
+
+    if request.method == 'POST':
+        form = UserChartForm(request.POST)
+        if form.is_valid():
+            selection = form.save(commit=False)
+            selection.save()
+            return redirect('user_chart_filter')
+
+    context = {'form':form}
+    return render(request, 'eventify/user_chart.html', context)
+    

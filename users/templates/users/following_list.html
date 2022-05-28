@@ -12,11 +12,21 @@
           <div class="article-metadata">
             <a class="mr-2" href="{% url 'profiledetail' user.username %}">{{ user.first_name }} {{ user.last_name }}</a>
           </div>
-          {% if request.user|is_following:user %}
-          <button class="btn btn-outline-primary" name="unfollow" value="{{object.username}}" type="submit">Unfollow</button>
-          {% else %}
-          <button class="btn btn-primary" name="follow" value="{{object.username}}" type="submit">Follow</button>
-          {% endif %}
+          <form method="POST" action="{% url 'follow_unfollow_user' user.username True username %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="hidden" name="user_id" value="{{user.id}}">
+            </div>
+            {% if request.user|is_following:user %}
+            <button class="btn btn-danger" name="unfollow" value="{{user.username}}" type="submit">Unfollow</button>
+            {% else %}
+            {% if request.user == user %}
+            {% else %}
+              <button class="btn btn-primary" name="follow" value="{{user.username}}" type="submit">Follow</button>
+            {% endif %}
+            {% endif %}
+        </form>
+
         </div>
 
       </article>
