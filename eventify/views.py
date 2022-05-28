@@ -605,8 +605,31 @@ def unregister_service(request, pk):
     
 #     return redirect('following_list', username=username)
 
+class ServicePromoteListView(LoginRequiredMixin,ListView):
+    context_object_name = 'object'
+    model = Service
+    template_name = 'eventify/service_promote_list.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        keyword=self.kwargs.get('q')
+        if not keyword :
+            context['services'] =Service.objects.filter(currentAtt__lte=5)
+            return context
+        context['services'] =Service.objects.filter(currentAtt__lte=keyword)
+        return context
 
+@login_required
+def promote(request):
+
+    if request.method == 'POST': 
+        id=request.POST.get("q")
+        print(id)
+        service=Service.objects.get(id=id)
+        service.isPromoted=True
+        service.save()
+
+        return redirect("service_promote_list")
 
 class FollowersView(ListView):
     model = Action

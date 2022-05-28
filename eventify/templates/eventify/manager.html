@@ -4,18 +4,25 @@
     <div class="3-rows">
 
         <div style="margin-bottom: 20px;margin-top:40px ;">
-            <a style="width:24%; background: #16c41e;" href="{% url 'service_chart' %}" class="btn btn-primary">Services</a>
+        <a style="width:24%; background: #5f788a;" href="{% url 'service_chart' %}" class="btn btn-primary">Services</a>
+        Admin dashboard for Services where you can query active and deactive
         </div>
-    
+
         <div style="margin-bottom: 20px;">
-            <a style="width:24%; background: #16c41e;" href="{% url 'event_chart' %}" class="btn btn-primary">Events</a>
+            <a style="width:24%; background: #5f788a;" href="{% url 'event_chart' %}" class="btn btn-primary">Events</a>
+            Admin dashboard for Events where you can query active and deactive Events
 
         </div>
         <div style="margin-bottom: 20px;">
-            <a style="width:24%; background: #16c41e;" href="{% url 'user_chart' %}" class="btn btn-primary">Users</a>
-  
+            <a style="width:24%; background: #5f788a;" href="{% url 'user_chart' %}" class="btn btn-primary">Users</a>
+            Admin dashboard for Users 
+
         </div>
-    
+
+        <div style="margin-bottom: 20px;">
+            <a style="width:24%; background: #5f788a;" href="{% url 'service_promote_list' %}" class="btn btn-primary">Promote</a>
+        </div>
+      
     </div>
     
 {% endblock content %}

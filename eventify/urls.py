@@ -10,6 +10,7 @@ from .views import (
     PostCreateView,
     PostUpdateView,
     PostDeleteView,
+    ServicePromoteListView,
     UserListView,
     ServiceListView,
     ServiceDetailView,
@@ -40,6 +41,7 @@ urlpatterns = [
 
     # service
     path('services', ServiceListView.as_view(), name='services'),
+    path('service_promote_list', ServicePromoteListView.as_view(), name='service_promote_list'),
     path('service/<int:pk>/', ServiceDetailView.as_view(), name='service_detail'),
     path('service/new/', ServiceCreateView.as_view(), name='service_create'),
     path('service/<int:pk>/update/', ServiceUpdateView.as_view(), name='service_update'),
@@ -88,5 +90,8 @@ urlpatterns = [
     path('user_chart', views.user_chart, name='user_chart'),
     path('user_chart_filter', views.user_chart_filter, name='user_chart_filter'),
     path('user_chart_data', views.user_chart_data, name='user_chart_data'),
+    path('promote', views.promote, name='promote'),
+   
+    
 
 ]
