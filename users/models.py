@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
@@ -20,6 +21,7 @@ INTEREST_CHOICES = (
 )
 
 class InterestSelection(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     interest_1 = models.CharField(max_length=120, choices=INTEREST_CHOICES)
     interest_2 = models.CharField(max_length=120, choices=INTEREST_CHOICES)
     interest_3 = models.CharField(max_length=120, choices=INTEREST_CHOICES)

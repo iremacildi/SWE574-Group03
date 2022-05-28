@@ -83,7 +83,7 @@ ROOT_URLCONF = 'web.urls'
 
 LOCATION_FIELD = {
     'provider.google.api': '//maps.google.com/maps/api/js?sensor=false',
-    'provider.google.api_key': 'AIzaSyCZpVlHNcseo02s65Ue8NpZYQGRCIwaMKo',
+    'provider.google.api_key': 'AIzaSyAErSD3FE8lpUf5fcqCEwNNVOhNiJgMPrU',
     'provider.google.api_libraries': '',
     'provider.google.map.type': 'ROADMAP',
 }

@@ -8,21 +8,13 @@
             <legend class="border-bottom mb-4">Profile Info</legend>
             {{ u_form|crispy }}
             {{ p_form|crispy }}
-        </fieldset>
-           
-            <label for="floatingSelect">Choose category</label>
-            <select class="form-select" name= "offer_list_category" multiple aria-label="multiple select example">
-              <option value="Seminar">Seminar</option>
-              <option value="Workshop">Workshop</option>
-              <option value="Themed party">Themed party</option>
-              <option value="Webinar">Webinar</option>
-              <option value="Summit">Summit</option>
-              <option value="Music festival">Music festival</option>
+            {{ r_form|crispy }}
 
-            </select>
+        </fieldset>
+
       
-            <div class="form-group">
-                <a href="{% url 'password_change' %}" class="btn btn-outline-danger" role="button">Change Password</a>
+        <div class="form-group">
+            <a href="{% url 'password_change' %}" class="btn btn-outline-danger" role="button">Change Password</a>
         </div>
 
         <div class="form-group">
@@ -30,5 +22,6 @@
         </div>
 
     </form>
+
 </div>
 {% endblock content %}

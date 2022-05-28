@@ -9,12 +9,15 @@ class UserRegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['first_name','last_name','username', 'email', 'password1', 'password2']
-        
+        fields = ['first_name','last_name','username', 'email', 'password1', 'password2','id']
+        exclude = ('id',)
+
 class InterestsForm(forms.ModelForm):
+
     class Meta:
         model = InterestSelection
-        fields = ['interest_1', 'interest_2', 'interest_3'] 
+        fields = ['user','interest_1', 'interest_2', 'interest_3'] 
+        exclude = ('user',)
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField()

@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
     <div class="content-section">
-        <form action="/interests/" method="post">
+        <form action="" method="POST">
                 <legend class="border-bottom mb-4">Please select your interests</legend>
                 {% csrf_token %}
                 {{ form.as_p }}
