@@ -562,6 +562,11 @@ def register_service(request, pk):
                 user.save()
                 action.send(request.user, verb="sent registration request", target=service)
                 messages.success(request, "Registration request sent successfully")
+
+                sender = request.user
+                receiver = service.author
+                notify.send(sender, recipient=receiver, verb='service is applied by', target=service)
+
                 return redirect('service_detail', pk=pk) 
        
     else:
