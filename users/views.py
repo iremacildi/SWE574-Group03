@@ -72,6 +72,7 @@ def profile(request):
         registerservice=RegisterService.objects.filter(owner=request.user.id,approved_register=False)
         myregisterservice=RegisterService.objects.filter(author_id=request.user.id)
         location = geolocator.reverse(profile.location,timeout=20)
+        interests=InterestSelection.objects.get(user_id=request.user.id)
 
     context = {
         'u_form': u_form,
@@ -81,7 +82,8 @@ def profile(request):
         'credits':profile.credits,
         'address':location.address,
         'registerservice':registerservice,
-        'myregisterservice':myregisterservice
+        'myregisterservice':myregisterservice,
+        'interests':interests
     }
     return render(request, 'users/profile.html', context)
 
