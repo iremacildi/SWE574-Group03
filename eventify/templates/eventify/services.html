@@ -28,6 +28,9 @@
       <option value="20.0">Inside Range 20KM</option>
     </select>
     {% endif %}
+    <label class="form-control" for="checkbox-1">Promoted:</label>
+    <input class="form-control" type="checkbox" name="promoted" id="checkbox-1" onchange="$('#mySearch').submit();" {% if request.GET.complete == 'True' %} checked {% endif %}>
+    
     <input class="btn btn-outline-success my-2 my-sm-0" style="margin-left:20px"type="submit" value="Search">
 </form> 
     {% for service in services %}
