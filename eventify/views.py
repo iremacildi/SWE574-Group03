@@ -64,10 +64,12 @@ class PostListView(ListView):
             keyword = self.request.GET['q']
             cat = self.request.GET['cat']
             km=self.request.GET['km']
+            promoted=self.request.GET['promoted']
         except:
             keyword = ''
             cat='all'
             km='all'
+            promoted=None
 
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
@@ -89,6 +91,7 @@ class PostListView(ListView):
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
+
 
         for item in object_list:
             try:
@@ -136,13 +139,16 @@ class ServiceListView(ListView):
     def get_queryset(self):
         my_list = []
         try:
+            
             keyword = self.request.GET['q']
             cat = self.request.GET['cat']
             km=self.request.GET['km']
+            promoted=self.request.GET['promoted']
         except:
             keyword = ''
             cat='all'
             km='all'
+            promoted=None
 
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
@@ -164,6 +170,8 @@ class ServiceListView(ListView):
 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.filter(IsCancelled=False)
+            if promoted is not None and promoted is not "on":
+                object_list=object_list.filter(isPromoted=True)
 
         for item in object_list:
             try:
