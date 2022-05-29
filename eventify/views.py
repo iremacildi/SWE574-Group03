@@ -73,9 +73,12 @@ class PostListView(ListView):
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword))
             wiki_items = search(keyword)
-            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
-            object_list2 = self.model.objects.filter(condition)
-            object_list=object_list|object_list2
+            if wiki_items:
+                condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+                object_list2 = self.model.objects.filter(condition)
+                object_list=object_list|object_list2
+            
+
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat)
                     
@@ -83,9 +86,10 @@ class PostListView(ListView):
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword) & Q(category__icontains=cat))
             wiki_items = search(keyword)
-            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
-            object_list2 = self.model.objects.filter(condition)
-            object_list=object_list|object_list2
+            if wiki_items:
+                condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+                object_list2 = self.model.objects.filter(condition)
+                object_list=object_list|object_list2
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
@@ -148,9 +152,10 @@ class ServiceListView(ListView):
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword),IsCancelled=False)
             wiki_items = search(keyword)
-            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
-            object_list2 = self.model.objects.filter(condition)
-            object_list=object_list|object_list2
+            if wiki_items:
+                condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+                object_list2 = self.model.objects.filter(condition)
+                object_list=object_list|object_list2
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat,IsCancelled=False)
                     
@@ -158,9 +163,10 @@ class ServiceListView(ListView):
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword)) & Q(category__icontains=cat,IsCancelled=False,)
             wiki_items = search(keyword)
-            condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
-            object_list2 = self.model.objects.filter(condition)
-            object_list=object_list|object_list2
+            if wiki_items:
+                condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+                object_list2 = self.model.objects.filter(condition)
+                object_list=object_list|object_list2
 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.filter(IsCancelled=False)
