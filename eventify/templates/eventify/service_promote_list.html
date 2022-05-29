@@ -1,0 +1,31 @@
+{% extends "eventify/base.html" %}
+{% block content %}
+{% for service in services %}
+<form class="form-inline my-2 my-lg-0 pb-2">
+  <input type="number"class="form-control mr-sm-2" name="a" type="search" placeholder="Min Attendee" aria-label="Search" style="width: 170px">
+  <input class="btn btn-outline-success my-2 my-sm-0" style="margin-left:20px"type="submit" value="Search">
+</form> 
+<article  class="media content-section">
+
+  <img class="rounded-circle article-img" src="{{ service.author.profile.image.url }}">
+  <div class="media-body">
+    
+    <div class="article-metadata">
+      <form method="POST" action="{% url 'promote' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <button style="margin-right: 0px;"class="btn btn-primary" name="q" value="{{service.id}}"type="submit">Promote</button> 
+        </div>
+        
+    </form>
+      <a class="mr-2" href="{% url 'profiledetail' service.author.username %}">{{ service.author }}</a>
+      <small class="text-muted">{{ service.date_posted|date:"F d, Y" }}</small>
+    </div>
+    
+  <h2><a class="article-title" href="{% url 'service_detail' service.pk %}">{{ service.title }}</a></h2>
+    <p ><strong>Attendee: </strong> {{ service.currentAtt }}  </p>
+   
+  </div>
+</article>
+{% endfor %}
+{% endblock content %}

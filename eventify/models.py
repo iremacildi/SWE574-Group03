@@ -72,6 +72,7 @@ class Service(models.Model):
     date_posted = models.DateTimeField(default=timezone.now)
     paid= models.BooleanField(default=False)
     isLate=BooleanField(default=False)
+    isPromoted=BooleanField(default=False)
     isGiven=BooleanField(default=False)
     IsCancelled= models.BooleanField(default=False)
     currentAtt=models.IntegerField(default=0)
