@@ -5,6 +5,10 @@
 {% load i18n %}
 <h2>{% blocktrans %} {{username}}'s following {% endblocktrans %}</h2>
 <ul>
+  {%if following_list|length is 0 %}
+  <p> {{username}} does not have any followers yet! </p>
+  {% endif %}
+
     {% for user in following_list %}
     <article  class="media content-section">
         <img class="rounded-circle article-img" src="{{ user.profile.image.url }}">
@@ -12,6 +16,7 @@
           <div class="article-metadata">
             <a class="mr-2" href="{% url 'profiledetail' user.username %}">{{ user.first_name }} {{ user.last_name }}</a>
           </div>
+
           <form method="POST" action="{% url 'follow_unfollow_user' user.username True username %}">
             {% csrf_token %}
             <div class="form-group">
@@ -26,6 +31,7 @@
             {% endif %}
             {% endif %}
         </form>
+
 
         </div>
 

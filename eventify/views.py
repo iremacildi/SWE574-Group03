@@ -635,7 +635,10 @@ class ServicePromoteListView(LoginRequiredMixin,ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        keyword=self.kwargs.get('q')
+        try:
+            keyword=self.request.GET['a']
+        except:
+            keyword=100  
         if not keyword :
             context['services'] =Service.objects.filter(currentAtt__lte=5)
             return context
