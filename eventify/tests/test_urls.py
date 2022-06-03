@@ -28,7 +28,7 @@ class URLTests(TestCase):
                 content='Service Test Description - SET UP', 
                 picture='uploads/event_pictures/default.png',
                 location='41.0255493,28.9742571',
-                category = 'Seminar',
+                category = 'Art',
                 eventtime = '15:00:00',
                 duration=2,
                 date_posted='2022-05-04 17:28:06.620026+03', 

@@ -10,13 +10,15 @@ from simple_history.models import HistoricalRecords
 
 
 CATEGORY_CHOICE = (
-    ('Seminar','Seminar'),
-    ('Conference', 'Conference'),
-    ('Workshop','Workshop'),
-    ('Themed party','Themed Party'),
-    ('Webinar','Webinar'),
-    ('Summit','Summit'),
-    ('Music festival','Music Festival'),)
+    ('sport','Sport'),
+    ('art', 'Art'),
+    ('music','Music'),
+    ('cooking','Cooking'),
+    ('agriculture','Agriculture'),
+    ('handicraft','Handicraft'),
+    ('dance','Dance'),
+    ('cinema','Cinema'),
+    ('fashion','fashion'),)
         
 
 def upload_post_to(instance,filename):
@@ -34,7 +36,7 @@ class Post(models.Model):
     tempLocation = models.TextField(blank=True)
     eventdate = models.DateField(default=timezone.now)
     eventtime=models.TimeField(default=timezone.now)
-    category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar')
+    category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Art')
     duration=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(6), MinValueValidator(1)])
     capacity=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(100), MinValueValidator(1)])
     picture = models.ImageField(upload_to='uploads/event_pictures/',blank=False)
@@ -63,7 +65,7 @@ class Service(models.Model):
     tempLocation = models.TextField(blank=True)
     eventtime=models.TimeField()
     duration=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(6), MinValueValidator(1)])
-    category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Seminar') 
+    category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Art') 
     capacity=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(20), MinValueValidator(1)])
     location = PlainLocationField(default='41.088165, 29.043431', zoom=7, blank=False, null=False)
     content = models.TextField()
