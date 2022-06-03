@@ -3,20 +3,24 @@
 <!-- Search Form -->
 
 <header><h1>Services</h1></header>
+
 <form class="form-inline my-2 my-lg-0 pb-2">
     <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search by keyword" aria-label="Search" style="width: 170px">
-   
+
     <label class="form-control" for="cars">Search by Tag: </label>
     <select class="form-control mr-sm-2" name="cat" id="cat">
       <option value="all">All</option>
-      <option value="Seminar">Seminar</option>
-      <option value="Conference">Conference</option>
-      <option value="Workshop">Workshop</option>
-      <option value="Themed party">Themed party</option>
-      <option value="Webinar">Webinar</option>
-      <option value="Summit">Summit</option>
-      <option value="Music festival">Music festival</option>
+      <option value="Sport">Sport</option>
+      <option value="art">Art</option>
+      <option value="music">Music</option>
+      <option value="cooking">Cooking</option>
+      <option value="agriculture">Agriculture</option>
+      <option value="handicraft">Handicraft</option>
+      <option value="dance">Dance</option>
+      <option value="cinema">Cinema</option>
+      <option value="fashion">Fashion</option>
     </select>
+
     {% if user.is_authenticated %}
     <label class="form-control" for="cars">Search by Distance: </label>
     <select class="form-control" name="km" id="ranges">
@@ -33,6 +37,8 @@
     
     <input class="btn btn-outline-success my-2 my-sm-0" style="margin-left:20px"type="submit" value="Search">
 </form> 
+
+
     {% for service in services %}
         <article  class="media content-section">
           <img class="rounded-circle article-img" src="{{ service.author.profile.image.url }}">

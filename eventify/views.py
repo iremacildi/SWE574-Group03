@@ -95,7 +95,10 @@ class PostListView(ListView):
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
+            
+      
 
+            
 
         for item in object_list:
             try:

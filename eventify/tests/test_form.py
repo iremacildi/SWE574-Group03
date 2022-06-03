@@ -32,7 +32,7 @@ class ServiceFormTest(TestCase):
             'location':'41.0255493,28.9742571',
             'eventdate': '2022-06-10',
             'eventtime': '15:00:00',
-            'category':'Seminar', 
+            'category':'Art', 
             'duration':'3',
             'capacity': '10',
             'picture': 'uploads/event_pictures/FileMock.png'
