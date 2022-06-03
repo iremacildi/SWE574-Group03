@@ -55,31 +55,31 @@ from django.db.models import Count
 class PostListView(ListView):
     model = Post
     template_name = 'eventify/index.html'
-    context_object_name = 'posts'
+    # context_object_name = 'posts'
     paginate_by = 5
 
-    def get_queryset(self):
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
         my_list = []
+        object_list2 = []
         try:
             keyword = self.request.GET['q']
             cat = self.request.GET['cat']
             km=self.request.GET['km']
-            promoted=self.request.GET['promoted']
         except:
             keyword = ''
             cat='all'
             km='all'
-            promoted=None
-
-        if keyword != '' and cat=="all":
-            object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword))
+        
+        if keyword != '':
             wiki_items = search(keyword)
             if wiki_items:
                 condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
                 object_list2 = self.model.objects.filter(condition)
-                object_list=object_list|object_list2
-            
+
+        if keyword != '' and cat=="all":
+            object_list = self.model.objects.filter(
+                Q(content__icontains=keyword) | Q(title__icontains=keyword))            
 
         elif keyword == '' and cat!="all":
             object_list = self.model.objects.filter(category=cat)
@@ -87,15 +87,9 @@ class PostListView(ListView):
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
                 Q(content__icontains=keyword) | Q(title__icontains=keyword) & Q(category__icontains=cat))
-            wiki_items = search(keyword)
-            if wiki_items:
-                condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
-                object_list2 = self.model.objects.filter(condition)
-                object_list=object_list|object_list2
                 
         elif keyword=='' and cat=='all':
             object_list = self.model.objects.all()
-
 
         for item in object_list:
             try:
@@ -107,9 +101,17 @@ class PostListView(ListView):
             for item in object_list:
                 if item.tempLocation<float(km):
                     my_list.append(item)
-            return my_list
+            sortedList = sorted(my_list, key=lambda x: x.tempLocation)
+            context['posts'] = sortedList
+            context['paginate_by'] = 5
+            context['wikiresult'] = object_list2
+            return context
         else:
-            return object_list
+            sortedList = sorted(object_list, key=lambda x: x.tempLocation)
+            context['posts'] = sortedList
+            context['paginate_by'] = 5
+            context['wikiresult'] = object_list2      
+            return context
 
 class FeedView(LoginRequiredMixin,ListView):
     model = Action
@@ -137,61 +139,72 @@ class NotificationsListView(ListView):
 class ServiceListView(ListView):
     model = Service
     template_name = 'eventify/services.html'
-    context_object_name = 'services'
+    # context_object_name = 'services'
     paginate_by = 4
 
-    def get_queryset(self):
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
         my_list = []
+        object_list2 = []
         try:
             
             keyword = self.request.GET['q']
             cat = self.request.GET['cat']
             km=self.request.GET['km']
-            promoted=self.request.GET['promoted']
         except:
             keyword = ''
             cat='all'
             km='all'
-            promoted=None
+        
+        # get promoted services
+        all_objects = self.model.objects.filter(IsCancelled=False)
+        promoted_objects=all_objects.filter(isPromoted=True)
+
+        if keyword != '':
+            wiki_items = search(keyword)
+            if wiki_items:
+                condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
+                object_list2 = self.model.objects.filter(condition, IsCancelled=False, isPromoted=False)
 
         if keyword != '' and cat=="all":
             object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword),IsCancelled=False)
-            wiki_items = search(keyword)
-            if wiki_items:
-                condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
-                object_list2 = self.model.objects.filter(condition)
-                object_list=object_list|object_list2
+                Q(content__icontains=keyword) | Q(title__icontains=keyword),IsCancelled=False, isPromoted=False)
+           
         elif keyword == '' and cat!="all":
-            object_list = self.model.objects.filter(category=cat,IsCancelled=False)
+            object_list = self.model.objects.filter(category=cat,IsCancelled=False, isPromoted=False)
                     
         elif keyword != '' and cat!="all":
             object_list = self.model.objects.filter(
-                Q(content__icontains=keyword) | Q(title__icontains=keyword)) & Q(category__icontains=cat,IsCancelled=False,)
-            wiki_items = search(keyword)
-            if wiki_items:
-                condition = functools.reduce(operator.or_, [Q(content__icontains=wiki_item) | Q(title__icontains=wiki_item) for wiki_item in wiki_items])
-                object_list2 = self.model.objects.filter(condition)
-                object_list=object_list|object_list2
+                Q(content__icontains=keyword) | Q(title__icontains=keyword) & Q(category__icontains=cat),IsCancelled=False, isPromoted=False)
 
         elif keyword=='' and cat=='all':
-            object_list = self.model.objects.filter(IsCancelled=False)
-            if promoted is not None and promoted is not "on":
-                object_list=object_list.filter(isPromoted=True)
+            object_list = self.model.objects.filter(IsCancelled=False, isPromoted=False)
 
         for item in object_list:
             try:
                 item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
             except:
                 item.tempLocation="Not calculated yet"    
-            
+        #  <QuerySet [<Service: Badminton>, <Service: test>]>
+        #     [<Service: Badminton>, <Service: test>]
+
         if km!='all':
             for item in object_list:
                 if item.tempLocation<float(km):
                     my_list.append(item)
-            return my_list
+            sortedList = sorted(my_list, key=lambda x: x.tempLocation)            
+            context['services'] = my_list
+            context['paginate_by'] = 4
+            context['promotedservices'] = promoted_objects      
+            context['wikiresult'] = object_list2    
+            return context
         else:
-            return object_list
+            sortedList = sorted(object_list, key=lambda x: x.tempLocation)
+            context['services'] = sortedList
+            context['paginate_by'] = 4
+            context['promotedservices'] = promoted_objects      
+            context['wikiresult'] = object_list2
+            return context
 
 def search(keyword):
     result = []
@@ -635,7 +648,10 @@ class ServicePromoteListView(LoginRequiredMixin,ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        keyword=self.kwargs.get('q')
+        try:
+            keyword=self.request.GET['a']
+        except:
+            keyword=100  
         if not keyword :
             context['services'] =Service.objects.filter(currentAtt__lte=5)
             return context

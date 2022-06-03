@@ -31,10 +31,25 @@
             },
             options: {
                       scales: {
-                yAxes: [{
+                        
+                yAxes: [{  
+                  min: 0,
+                  max: 100,
                     ticks: {
-                        beginAtZero: true
-                    }
+                        stepSize: 1,
+                        beginAtZero: true,
+                    },
+                    scaleLabel: {
+                   display: true,
+                   labelString: "Number of Users"
+                }
+                    
+                }], 
+                xAxes: [{
+                
+                        barThickness:10,
+                        maxBarThickness: 10,
+
                 }]
             },
               responsive: true,
@@ -43,7 +58,7 @@
               },
               title: {
                 display: true,
-                text: 'Users'
+                text: 'Number of Users as Per Their Creation Date'
               }
             
             }
