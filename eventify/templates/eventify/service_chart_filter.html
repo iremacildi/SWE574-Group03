@@ -33,9 +33,20 @@
                       scales: {
                 yAxes: [{
                     ticks: {
+                      stepSize: 1,
                         beginAtZero: true
-                    }
-                }]
+                    },
+                    scaleLabel: {
+                   display: true,
+                   labelString: "Number of Services"
+                }
+                }],
+                xAxes: [{
+                
+                barThickness:10,
+                maxBarThickness: 10,
+
+        }]
             },
               responsive: true,
               legend: {
@@ -43,7 +54,7 @@
               },
               title: {
                 display: true,
-                text: 'Services'
+                text: 'Number of Services as Per Their Creation Date'
               }
             
             }

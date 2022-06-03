@@ -32,10 +32,24 @@
             options: {
                       scales: {
                 yAxes: [{
+                  min: 0,
+                  max: 100,
                     ticks: {
+                      stepSize: 1,
                         beginAtZero: true
-                    }
-                }]
+                    },  
+                    scaleLabel: {
+                   display: true,
+                   labelString: "Number of Events"
+                }
+                }],                
+                xAxes: [{
+                
+                barThickness:10,
+                maxBarThickness: 10,
+               
+           
+        }]
             },
               responsive: true,
               legend: {
@@ -43,7 +57,7 @@
               },
               title: {
                 display: true,
-                text: 'Events'
+                text: 'Number of Events as Per Their Creation Date'
               }
             
             }

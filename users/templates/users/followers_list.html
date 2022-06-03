@@ -5,6 +5,10 @@
 {% load i18n %}
 <h2>{% blocktrans %} {{username}}'s followers {% endblocktrans %}</h2>
 <ul>
+  {%if followers_list|length is 0 %}
+  <p> {{username}} does not have any followers yet! </p>
+  {% endif %}
+
     {% for user in followers_list %}
     <article  class="media content-section">
         <img class="rounded-circle article-img" src="{{ user.profile.image.url }}">

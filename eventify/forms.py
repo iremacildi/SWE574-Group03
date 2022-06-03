@@ -35,6 +35,7 @@ class ServiceForm(forms.ModelForm):
 
 
 class ServiceChartForm(forms.ModelForm):
+    paid=forms.BooleanField(label='Is Handshaked')
     class Meta:
         model = ServiceChart
         fields = ['start_date','end_date','min_attendee','max_attendee','paid','isLate','isGiven','IsCancelled','range','location']
@@ -42,6 +43,7 @@ class ServiceChartForm(forms.ModelForm):
         widgets = {
             'start_date':DateInput(attrs={'type': 'date'}),
             'end_date':DateInput(attrs={'type': 'date'}),
+            
         }
 class EventChartForm(forms.ModelForm):
     class Meta:
@@ -60,5 +62,6 @@ class UserChartForm(forms.ModelForm):
         widgets = {
             'start_date':DateInput(attrs={'type': 'date'}),
             'end_date':DateInput(attrs={'type': 'date'}),
+            
 
         }                
