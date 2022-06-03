@@ -32,13 +32,35 @@
       <option value="10.0">Inside Range 10KM</option>
       <option value="20.0">Inside Range 20KM</option>
     </select>
-    {% endif %}
-    <label class="form-control" for="checkbox-1">Promoted:</label>
-    <input class="form-control" type="checkbox" name="promoted" id="checkbox-1" onchange="$('#mySearch').submit();" {% if request.GET.complete == 'True' %} checked {% endif %}>
-    
+    {% endif %}    
     <input class="btn btn-outline-success my-2 my-sm-0" style="margin-left:20px"type="submit" value="Search">
-</form> 
+</form>     
 
+    {% if services|length == 0 %}
+    <div class="alert alert-warning">
+      <strong>Sorry!</strong> We couldn't find a service for you...
+    </div><br/>
+    {% endif %}
+
+    {% for promoted in promotedservices %}
+        <article  class="media content-section" style="background-color: #E9D5CA;">
+          <img class="rounded-circle article-img" src="{{ promoted.author.profile.image.url }}">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="{% url 'profiledetail' promoted.author.username %}">{{ promoted.author }}</a> 
+              <small class="text-muted">{{ promoted.date_posted|date:"F d, Y" }}</small>
+              <small>- Promoted Service</small>
+            </div>
+          <h2><a class="article-title" href="{% url 'service_detail' promoted.pk %}">{{ promoted.title }}</a></h2>
+            <p class="article-content">{{ promoted.content|safe }}</p>
+            <p ><strong>Duration: </strong> {{ promoted.duration }} Hours </p>
+            <p ><strong>Distance (KM): {{promoted.tempLocation }}</strong></p>
+          </div>
+          <div style="border-radius: 5px;" class="tags" name="{{promoted.category}}">
+            {{promoted.category}}    
+          </div>
+        </article>
+    {% endfor %}
 
     {% for service in services %}
         <article  class="media content-section">
@@ -58,6 +80,31 @@
           </div>
         </article>
     {% endfor %}
+
+    {% if wikiresult|length != 0 %}
+    <div class="alert alert-success">
+      The following services may interest you.
+    </div>
+    {% endif %}
+    {% for result in wikiresult %}
+        <article  class="media content-section">
+          <img class="rounded-circle article-img" src="{{ result.author.profile.image.url }}">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="{% url 'profiledetail' result.author.username %}">{{ result.author }}</a>
+              <small class="text-muted">{{ result.date_posted|date:"F d, Y" }}</small>
+            </div>
+          <h2><a class="article-title" href="{% url 'service_detail' result.pk %}">{{ result.title }}</a></h2>
+            <p class="article-content">{{ result.content|safe }}</p>
+            <p ><strong>Duration: </strong> {{ result.duration }} Hours </p>
+            <p ><strong>Distance (KM): {{result.tempLocation }}</strong></p>
+          </div>
+          <div style="border-radius: 5px;" class="tags" name="{{result.category}}">
+            {{result.category}}    
+          </div>
+        </article>
+    {% endfor %}
+
     {% if is_paginated %}
       {% if page_obj.has_previous %}
         <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
