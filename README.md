@@ -1,5 +1,11 @@
+Eventify - Group 3 Project for BOUN SWE574 Master Class
 
-I share my researches, studies and assignments for the course. 
+![Alt Text](https://imgflip.com/gif/6iit08)
+
+
+
+
+We share our researches, studies and assignments for the course. 
 
 You can visit Wiki page to see more details.
 
