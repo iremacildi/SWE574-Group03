@@ -96,6 +96,12 @@ class PostListView(ListView):
                 item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
             except:
                 item.tempLocation="Not calculated yet"     
+        
+        for item in object_list2:
+            try:
+                item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
+            except:
+                item.tempLocation="Not calculated yet"       
 
         if km!='all':
             for item in object_list:
@@ -185,8 +191,18 @@ class ServiceListView(ListView):
                 item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
             except:
                 item.tempLocation="Not calculated yet"    
-        #  <QuerySet [<Service: Badminton>, <Service: test>]>
-        #     [<Service: Badminton>, <Service: test>]
+        
+        for item in promoted_objects:
+            try:
+                item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
+            except:
+                item.tempLocation="Not calculated yet"    
+        
+        for item in object_list2:
+            try:
+                item.tempLocation=round(geodesic(item.location, self.request.user.profile.location).km,2)
+            except:
+                item.tempLocation="Not calculated yet"    
 
         if km!='all':
             for item in object_list:
