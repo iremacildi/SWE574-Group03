@@ -90,11 +90,12 @@ $ CREATE DATABASE eventify;
 $ \l  (to check if the database is created).
 ```
 
-- After creating a database, write “docker-compose up --build” in your terminal. Check if the containers are up and running.
-- Create Super User (for Admin page) with this commands
+- After creating a database, write “docker-compose up --build” in your terminal. Check if the containers are up and running with the following command.
 ```
 docker ps -a
 ```
+- Create Super User (for Admin page) with this commands
+
 fetch the container id from above command and copy it. We will use it in the command below.
 ```
 docker exec -it <copy container id> python manage.py createsuperuser
