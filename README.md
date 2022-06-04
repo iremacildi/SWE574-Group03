@@ -6,7 +6,7 @@ You can visit Wiki page to see more details.
 Code can be reached from master branch.
 
 ## Clone project files to your local machine
-	git clone [https://github.com/arcanaktepe/swe5732021fall.git](https://github.com/iremacildi/SWE574-Group03.git)
+	git clone https://github.com/iremacildi/SWE574-Group03.git
 
 ## Create virtual environment
   > run python -m .env  <name_of your_virtualenv>
