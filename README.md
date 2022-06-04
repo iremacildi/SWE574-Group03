@@ -6,10 +6,7 @@
 This repo will serve SWE574 course on 2022, Spring semester. 
 We will present our researches, code, project details such as milestones, issues and the results.
 
-![alt text](https://gfycat.com/indolentvalidiberianlynx  "Demo")
-
 Please check out our Wiki for further details.
-
 
 ## How to install Eventify?
 
@@ -40,7 +37,48 @@ Before starting, please make sure your local system has postgresql, docker and g
  * DB_PORT=5432
  * CORS_ALLOWED_ORIGINS="http://localhost:3000 http://127.0.0.1:3000"
  ```
-- After step 6, you need to create a database in your local environment. To create a database follow the next step. As mentioned above, make sure that Docker desktop is up and running.
+ - Update docker-compose.yml as follows
+
+```
+version: '3.8'
+ 
+services:
+
+
+           
+  web:
+   container_name: core_eventify
+   build: .
+   restart: always
+   env_file: ./web/.env
+   volumes:
+     - .:/web
+     - static_volume:/web/static
+   depends_on:
+     - db 
+
+   ports:
+     - 80:8000
+  
+  db:
+    container_name: core_db
+    image: postgres:14.1-alpine
+    env_file:  ./web/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+     - 5433:5432
+
+
+volumes:
+  static_volume:
+  postgres_data:
+  nginx_secrets:
+```
+
+ 
+ 
+- After the update we need to create a database in local environment. To create a database follow the next step (make sure that Docker desktop is up and running).
 
 - Create a Database in your local with the following commands (write without $ sign).
 ```
@@ -52,6 +90,19 @@ $ CREATE DATABASE eventify;
 $ \l  (to check if the database is created).
 ```
 
-- After creating a database, write “docker-compose up” in your terminal. Check if the containers are up and running.
-- Create Super User (for Admin page) “python manage.py createsuperuser”
+- After creating a database, write “docker-compose up --build” in your terminal. Check if the containers are up and running.
+- Create Super User (for Admin page) with this commands
+```
+docker ps -a
+```
+fetch the container id from above command and copy it. We will use it in the command below.
+```
+docker exec -it <copy container id> python manage.py createsuperuser
+```
+and the terminal will ask the questions below, feel free to enter anything. We will present arbitrary values.
+```
+- Username (leave blank to use 'root'): manager
+- Email address: manager@mail.com
+- Password: Qrp123!
+```
 - Go to your local host port 80 in the browser, 127.0.0.1:80
