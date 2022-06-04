@@ -15,18 +15,20 @@ Please check out our Wiki for further details.
 
 To use this project, first clone the repo on your device using the command below:
 
-git init
+```git init```
 
-git clone git clone https://github.com/iremacildi/SWE574-Group03.git
+```git clone git clone https://github.com/iremacildi/SWE574-Group03.git```
 
 ## System Manual
 
 Before starting, please make sure your local system has postgresql, docker and git.
 
-Create a virtual environment (arbitrary name for virtual env is “myvenv”)
-Go to project directory and in your IDE terminal please write: “source myvenv/bin/activate”
-Install Dependencies $ pip install -r requirements.txt
-Go to “.env” from main project directory through your IDE. Update the inside of the document as follows.
+- Create a virtual environment (arbitrary name for virtual env is “myvenv”)
+- Go to project directory and in your IDE terminal please write: “source myvenv/bin/activate”
+- Install Dependencies $ pip install -r requirements.txt
+- Go to “.env” from main project directory through your IDE. 
+- Update the inside of the document as follows.
+```
  * DJANGO_SECRET_KEY= <your django secret key>
  * DJANGO_DEBUG=True
  * DJANGO_ALLOWED_HOSTS="127.0.0.1"
@@ -37,14 +39,17 @@ Go to “.env” from main project directory through your IDE. Update the inside
  * DB_HOST=127.0.0.1
  * DB_PORT=5432
  * CORS_ALLOWED_ORIGINS="http://localhost:3000 http://127.0.0.1:3000"
-After step 6, you need to create a database in your local environment. To create a database follow the next step. As mentioned above, make sure that Docker desktop is up and running.
-Create a Database in your local with the following commands (write without $ sign).
+ ```
+- After step 6, you need to create a database in your local environment. To create a database follow the next step. As mentioned above, make sure that Docker desktop is up and running.
+
+- Create a Database in your local with the following commands (write without $ sign).
 $ docker-compose up --build
 $ docker-compose start db 
 $ docker exec -it core_db bash
 $ psql -U postgres
 $ CREATE DATABASE eventify;
 $ \l  (to check if the database is created).
-After creating a database, write “docker-compose up” in your terminal. Check if the containers are up and running.
-Create Super User (for Admin page) “python manage.py createsuperuser”
-Go to your local host port 80 in the browser, 127.0.0.1:80
+
+- After creating a database, write “docker-compose up” in your terminal. Check if the containers are up and running.
+- Create Super User (for Admin page) “python manage.py createsuperuser”
+- Go to your local host port 80 in the browser, 127.0.0.1:80
