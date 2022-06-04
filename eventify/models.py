@@ -35,7 +35,7 @@ class Post(models.Model):
     content = models.TextField()
     tempLocation = models.TextField(blank=True)
     eventdate = models.DateField(default=timezone.now)
-    eventtime=models.TimeField(default=timezone.now)
+    eventtime=models.TimeField()
     category=models.CharField(max_length=20, choices=CATEGORY_CHOICE, default='Art')
     duration=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(6), MinValueValidator(1)])
     capacity=models.PositiveIntegerField(default=1,validators=[MaxValueValidator(100), MinValueValidator(1)])
