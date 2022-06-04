@@ -43,12 +43,14 @@ Before starting, please make sure your local system has postgresql, docker and g
 - After step 6, you need to create a database in your local environment. To create a database follow the next step. As mentioned above, make sure that Docker desktop is up and running.
 
 - Create a Database in your local with the following commands (write without $ sign).
+```
 $ docker-compose up --build
 $ docker-compose start db 
 $ docker exec -it core_db bash
 $ psql -U postgres
 $ CREATE DATABASE eventify;
 $ \l  (to check if the database is created).
+```
 
 - After creating a database, write “docker-compose up” in your terminal. Check if the containers are up and running.
 - Create Super User (for Admin page) “python manage.py createsuperuser”
